@@ -6,24 +6,58 @@
 <title>商品計算</title>
 <style>
   body { font-family: sans-serif; padding: 20px; }
+
+  /* 헤더 스타일 */
+  .header {
+    display: flex;
+    justify-content: space-between;
+    font-weight: bold;
+    margin-bottom: 10px;
+    border-bottom: 2px solid #ccc;
+    padding-bottom: 6px;
+  }
+  .h-name { width: 40%; }
+  .h-price { width: 20%; text-align: right; }
+  .h-qty { width: 40%; text-align: right; }
+
+  /* 상품 행 */
   .item { display: flex; justify-content: space-between; margin: 12px 0; }
   .name { width: 40%; }
   .price { width: 20%; text-align: right; }
   .qty { width: 40%; text-align: right; }
-  button { min-width: 32px; height: 32px; padding: 0 10px; }
+
+  /* 버튼 */
+  button {
+    min-width: 32px;
+    height: 32px;
+    padding: 0 10px;
+  }
+
   #total { font-size: 1.4em; margin-top: 20px; font-weight: bold; }
-  #resetBtn { margin-top: 20px; padding: 10px 20px; font-size: 1em; }
+
+  #resetBtn {
+    margin-top: 20px;
+    padding: 10px 20px;
+    font-size: 1em;
+  }
 </style>
 </head>
 <body>
 
 <h2>商品計算</h2>
 
+<!-- ★ 표 헤더 추가 -->
+<div class="header">
+  <div class="h-name">商品名</div>
+  <div class="h-price">単価</div>
+  <div class="h-qty">数量</div>
+</div>
+
 <div id="items"></div>
 
 <div id="total">合計: 0円</div>
 
-<button id="resetBtn" onclick="resetAll()">クリア</button>
+<button id="resetBtn" onclick="resetAll()">すべてクリア</button>
 
 <script>
 const products = [
