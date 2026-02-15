@@ -162,7 +162,7 @@ function resetAll() {
 }
 
 function saveHistory(received, total) {
-  const time = new Date().toLocaleTimeString();
+  const time = new Date().toLocaleTimeString("ja-JP", { hour12: false });
   let qtyList = "";
 
   products.forEach((p, i) => {
