@@ -38,8 +38,14 @@
     margin-top: 15px;
   }
 
+  .top-bar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 15px;
+  }
+  
   #resetBtn {
-    margin-top: 20px;
     padding: 10px 20px;
     font-size: 1em;
   }
@@ -72,7 +78,10 @@
 </head>
 <body>
 
-<h2>商品計算</h2>
+<div class="top-bar">
+  <h2>グッズ販売</h2>
+  <button id="resetBtn" onclick="resetAll()">すべてクリア</button>
+</div>
 
 <div class="header">
   <div class="h-name">商品名</div>
@@ -97,8 +106,6 @@
 
 <!-- 거스름돈 표시 -->
 <div id="change"></div>
-
-<button id="resetBtn" onclick="resetAll()">すべてクリア</button>
 
 <!-- 이력 -->
 <div id="history">
