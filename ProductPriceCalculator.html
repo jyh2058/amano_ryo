@@ -61,6 +61,13 @@
     padding: 3px 8px;
     font-size: 0.8em;
   }
+
+  #change {
+    min-height: 1.4em;
+    font-size: 1.4em;
+    font-weight: bold;
+    margin-top: 15px;
+  }
 </style>
 </head>
 <body>
@@ -86,7 +93,7 @@
   pattern="[0-9]*" 
   style="width:150px; font-size:16px; touch-action:manipulation;"
 >
-<button onclick="calcChange()">計算</button>
+<button onclick="calcChange()" style="font-size:1em; padding:10px 20px;">計算</button>
 
 <!-- 거스름돈 표시 -->
 <div id="change"></div>
