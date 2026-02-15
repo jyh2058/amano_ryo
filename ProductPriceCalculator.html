@@ -69,7 +69,13 @@
 <!-- 받은 금액 입력 -->
 <div style="margin-top:20px;">
   <label>受取金額: </label>
-  <input type="number" id="received" style="width:120px;">
+  <input 
+    type="number" 
+    id="received" 
+    inputmode="numeric" 
+    pattern="[0-9]*" 
+    style="width:120px; font-size:16px; touch-action:manipulation;"
+  >
   <button onclick="calcChange()">計算</button>
 </div>
 
