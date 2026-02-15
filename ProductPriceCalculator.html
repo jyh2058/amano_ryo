@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>商品計算</title>
+<style>
+  body { font-family: sans-serif; padding: 20px; }
+  .item { display: flex; justify-content: space-between; margin: 12px 0; }
+  .name { width: 40%; }
+  .price { width: 20%; text-align: right; }
+  .qty { width: 40%; text-align: right; }
+  button { width: 32px; height: 32px; }
+  #total { font-size: 1.4em; margin-top: 20px; font-weight: bold; }
+</style>
+</head>
+<body>
+
+<h2>商品計算</h2>
+
+<div id="items"></div>
+
+<div id="total">合計: 0円</div>
+
+<script>
+const products = [
+  { name: "上諏訪の女", price: 1250 },
+  { name: "捨てちまえ", price: 1350 },
+  { name: "天野涼 ペンライト", price: 3000 },
+  { name: "柊子", price: 1500 }
+];
+
+const itemsDiv = document.getElementById("items");
+
+products.forEach((p, idx) => {
+  const row = document.createElement("div");
+  row.className = "item";
+  row.innerHTML = `
+    <div class="name">${p.name}</div>
+    <div class="price">${p.price}円</div>
+    <div class="qty">
+      <button onclick="changeQty(${idx}, -1)">-</button>
+      <span id="qty${idx}">0</span>
+      <button onclick="changeQty(${idx}, 1)">+</button>
+    </div>
+  `;
+  itemsDiv.appendChild(row);
+});
+
+function changeQty(i, delta) {
+  const qtySpan = document.getElementById("qty" + i);
+  let qty = parseInt(qtySpan.textContent) + delta;
+  if (qty < 0) qty = 0;
+  qtySpan.textContent = qty;
+  calcTotal();
+}
+
+function calcTotal() {
+  let sum = 0;
+  products.forEach((p, i) => {
+    const qty = parseInt(document.getElementById("qty" + i).textContent);
+    sum += p.price * qty;
+  });
+  document.getElementById("total").textContent = `合計: ${sum.toLocaleString()}円`;
+}
+</script>
+
+</body>
+</html>
