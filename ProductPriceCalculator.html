@@ -3,13 +3,10 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<meta property="og:title" content="グッズ販売" />
-<meta property="og:description" content="グッズ販売の金額計算" />
 <title>グッズ販売</title>
 <style>
   body { font-family: sans-serif; padding: 20px; }
 
-  /* 헤더 스타일 */
   .header {
     display: flex;
     justify-content: space-between;
@@ -22,13 +19,11 @@
   .h-price { width: 20%; text-align: right; }
   .h-qty { width: 40%; text-align: right; }
 
-  /* 상품 행 */
   .item { display: flex; justify-content: space-between; margin: 12px 0; }
   .name { width: 40%; }
   .price { width: 20%; text-align: right; }
   .qty { width: 40%; text-align: right; }
 
-  /* 버튼 */
   button {
     min-width: 32px;
     min-height: 32px;
@@ -43,13 +38,24 @@
     padding: 10px 20px;
     font-size: 1em;
   }
+
+  #history {
+    margin-top: 30px;
+    border-top: 2px solid #ccc;
+    padding-top: 15px;
+  }
+
+  .history-item {
+    margin-bottom: 12px;
+    padding-bottom: 8px;
+    border-bottom: 1px dashed #aaa;
+  }
 </style>
 </head>
 <body>
 
 <h2>商品計算</h2>
 
-<!-- ★ 표 헤더 추가 -->
 <div class="header">
   <div class="h-name">商品名</div>
   <div class="h-price">単価</div>
@@ -60,7 +66,23 @@
 
 <div id="total">合計: 0円</div>
 
+<!-- 받은 금액 입력 -->
+<div style="margin-top:20px;">
+  <label>受取金額: </label>
+  <input type="number" id="received" style="width:120px;">
+  <button onclick="calcChange()">計算</button>
+</div>
+
+<!-- 거스름돈 표시 -->
+<div id="change" style="margin-top:10px; font-weight:bold;"></div>
+
 <button id="resetBtn" onclick="resetAll()">すべてクリア</button>
+
+<!-- 이력 -->
+<div id="history">
+  <h3>計算履歴</h3>
+  <div id="historyList"></div>
+</div>
 
 <script>
 const products = [
@@ -102,13 +124,56 @@ function calcTotal() {
     sum += p.price * qty;
   });
   document.getElementById("total").textContent = `合計: ${sum.toLocaleString()}円`;
+  return sum;
+}
+
+function calcChange() {
+  const received = parseInt(document.getElementById("received").value || 0);
+  const total = calcTotal();
+  const change = received - total;
+
+  if (received === 0) {
+    document.getElementById("change").textContent = "受取金額を入力してください。";
+    return;
+  }
+
+  if (change < 0) {
+    document.getElementById("change").textContent = `不足: ${Math.abs(change)}円`;
+  } else {
+    document.getElementById("change").textContent = `お釣り: ${change}円`;
+  }
+
+  saveHistory(received, total);
 }
 
 function resetAll() {
   products.forEach((_, i) => {
     document.getElementById("qty" + i).textContent = 0;
   });
+  document.getElementById("received").value = "";
+  document.getElementById("change").textContent = "";
   calcTotal();
+}
+
+function saveHistory(received, total) {
+  const time = new Date().toLocaleTimeString();
+  let qtyList = "";
+
+  products.forEach((p, i) => {
+    const qty = parseInt(document.getElementById("qty" + i).textContent);
+    qtyList += `${p.name}: ${qty}　`;
+  });
+
+  const div = document.createElement("div");
+  div.className = "history-item";
+  div.innerHTML = `
+    <div><strong>時間:</strong> ${time}</div>
+    <div><strong>受取:</strong> ${received}円</div>
+    <div><strong>合計:</strong> ${total}円</div>
+    <div><strong>数量:</strong> ${qtyList}</div>
+  `;
+
+  document.getElementById("historyList").prepend(div);
 }
 </script>
 
