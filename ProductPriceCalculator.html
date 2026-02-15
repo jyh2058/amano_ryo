@@ -12,6 +12,7 @@
   .qty { width: 40%; text-align: right; }
   button { width: 32px; height: 32px; }
   #total { font-size: 1.4em; margin-top: 20px; font-weight: bold; }
+  #resetBtn { margin-top: 20px; padding: 10px 20px; font-size: 1em; }
 </style>
 </head>
 <body>
@@ -21,6 +22,8 @@
 <div id="items"></div>
 
 <div id="total">合計: 0円</div>
+
+<button id="resetBtn" onclick="resetAll()">すべてクリア</button>
 
 <script>
 const products = [
@@ -62,6 +65,13 @@ function calcTotal() {
     sum += p.price * qty;
   });
   document.getElementById("total").textContent = `合計: ${sum.toLocaleString()}円`;
+}
+
+function resetAll() {
+  products.forEach((_, i) => {
+    document.getElementById("qty" + i).textContent = 0;
+  });
+  calcTotal();
 }
 </script>
 
