@@ -184,6 +184,8 @@ function saveHistory(received, total) {
 
   const time = new Date().toLocaleTimeString("ja-JP", { hour12: false });
 
+  const change = received - total;  // ← 거스름돈 계산 추가
+
   let qtyList = "";
   products.forEach((p, i) => {
     const qty = parseInt(document.getElementById("qty" + i).textContent);
@@ -199,6 +201,7 @@ function saveHistory(received, total) {
     <div><strong>時間:</strong> ${time}</div>
     <div><strong>受取:</strong> ${received}円</div>
     <div><strong>合計:</strong> ${total}円</div>
+    <div><strong>お釣り:</strong> ${change}円</div>   <!-- ★ 추가된 부분 -->
     <div><strong>数量:</strong> ${qtyList}</div>
     <button class="delete-btn" onclick="deleteHistory(${historyCount})">削除</button>
   `;
