@@ -223,12 +223,21 @@ function deleteHistory(id) {
   if (item) item.remove();
 }
 
-// ★ 숫자 키보드 '완료(Enter)' 눌렀을 때도 계산 + 스크롤 위로 이동
-document.getElementById("received").addEventListener("keydown", function(e) {
-  if (e.key === "Enter") {
-    calcChange();
-    window.scrollTo({ top: 0, behavior: "smooth" });
+// ★ 받은 금액 포커스 인: 콤마 제거
+document.getElementById("received").addEventListener("focus", function () {
+  let v = this.value.replace(/,/g, "");
+  this.value = v;
+});
+
+// ★ 받은 금액 포커스 아웃: 콤마 적용 + 화면 상단 이동
+document.getElementById("received").addEventListener("blur", function () {
+  let v = this.value.replace(/,/g, "");
+  if (v !== "" && !isNaN(v)) {
+    this.value = Number(v).toLocaleString();
   }
+
+  // 화면 상단으로 이동
+  window.scrollTo({ top: 0, behavior: "smooth" });
 });
 </script>
 
