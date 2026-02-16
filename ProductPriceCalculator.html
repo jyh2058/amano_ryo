@@ -32,6 +32,10 @@
   button {
     touch-action: manipulation;
   }
+
+  .qty-buttons {
+    white-space: nowrap;
+  }
 </style>
 </head>
 <body>
@@ -98,7 +102,7 @@ products.forEach((p, idx) => {
   row.innerHTML = `
     <div class="col-5">${p.name}</div>
     <div class="col-3 text-end">${p.price.toLocaleString()}円</div>
-    <div class="col-4 text-end">
+    <div class="col-4 text-end qty-buttons">
       <button class="btn btn-outline-secondary btn-sm" onclick="changeQty(${idx}, -1)">
         <i class="fa-solid fa-minus"></i>
       </button>
@@ -108,6 +112,7 @@ products.forEach((p, idx) => {
       </button>
     </div>
   `;
+  
   itemsDiv.appendChild(row);
 });
 
