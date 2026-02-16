@@ -223,6 +223,14 @@ function deleteHistory(id) {
   const item = document.getElementById("history-" + id);
   if (item) item.remove();
 }
+
+// ★ 숫자 키보드 '완료' 눌렀을 때도 계산 + 스크롤 위로 이동
+document.getElementById("received").addEventListener("keydown", function(e) {
+  if (e.key === "Enter") {
+    calcChange();
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  }
+});
 </script>
 
 </body>
