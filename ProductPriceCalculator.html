@@ -56,7 +56,11 @@
 
 <!-- 받은 금액 (한 줄 구성) -->
 <div class="d-flex align-items-center flex-nowrap mt-3" style="gap:6px;">
-  <span id="receivedLabel" class="flex-shrink-0">受取金額:</span>
+
+  <div id="receivedLabel" class="d-flex align-items-center flex-shrink-0" 
+       style="font-size:1.4em; font-weight:bold;">
+    受取金額:
+  </div>
 
   <input 
     type="text"
@@ -70,6 +74,7 @@
   <button class="btn btn-primary flex-shrink-0" style="padding:8px 14px;" onclick="calcChange()">
     計算
   </button>
+
 </div>
 
 <!-- 거스름돈 -->
