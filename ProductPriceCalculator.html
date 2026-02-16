@@ -156,6 +156,7 @@ function calcChange() {
 
   if (change < 0) {
     document.getElementById("change").textContent = `不足: ${Math.abs(change).toLocaleString()}円`;
+    return;
   } else {
     document.getElementById("change").textContent = `お釣り: ${change.toLocaleString()}円`;
   }
