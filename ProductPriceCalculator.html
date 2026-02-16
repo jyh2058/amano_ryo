@@ -31,7 +31,6 @@
     touch-action: manipulation;
   }
 
-  /* 합계 / 받은 금액 / 거스름돈 폰트 통일 */
   #total, #change, #receivedLabel {
     font-size: 1.4em;
     font-weight: bold;
@@ -93,21 +92,18 @@
 
 <div id="total">合計: 0円</div>
 
-<!-- 받은 금액 입력 -->
 <div id="receivedLabel">受取金額:</div>
 <input 
-  type="number" 
-  id="received" 
-  inputmode="numeric" 
-  pattern="[0-9]*" 
+  type="text"
+  id="received"
+  inputmode="numeric"
+  pattern="[0-9]*"
   style="width:150px; font-size:16px; touch-action:manipulation;"
 >
 <button onclick="calcChange()" style="font-size:1em; padding:10px 20px;">計算</button>
 
-<!-- 거스름돈 표시 -->
 <div id="change"></div>
 
-<!-- 이력 -->
 <div id="history">
   <h3>計算履歴</h3>
   <div id="historyList"></div>
@@ -158,8 +154,13 @@ function calcTotal() {
   return sum;
 }
 
+function getReceivedValue() {
+  const raw = document.getElementById("received").value.replace(/,/g, "");
+  return raw === "" ? 0 : parseInt(raw);
+}
+
 function calcChange() {
-  const received = parseInt(document.getElementById("received").value || 0);
+  const received = getReceivedValue();
   const total = calcTotal();
   const change = received - total;
 
@@ -176,7 +177,6 @@ function calcChange() {
 
   saveHistory(received, total);
 
-  // ★ 계산 후 자동으로 화면 상단으로 이동
   window.scrollTo({ top: 0, behavior: "smooth" });
 }
 
@@ -223,21 +223,26 @@ function deleteHistory(id) {
   if (item) item.remove();
 }
 
-// ★ 받은 금액 포커스 인: 콤마 제거
+/* ★ 포커스 인: 콤마 제거 */
 document.getElementById("received").addEventListener("focus", function () {
-  let v = this.value.replace(/,/g, "");
-  this.value = v;
+  this.value = this.value.replace(/,/g, "");
 });
 
-// ★ 받은 금액 포커스 아웃: 콤마 적용 + 화면 상단 이동
+/* ★ 포커스 아웃: 콤마 적용 + 화면 상단 이동 */
 document.getElementById("received").addEventListener("blur", function () {
   let v = this.value.replace(/,/g, "");
   if (v !== "" && !isNaN(v)) {
     this.value = Number(v).toLocaleString();
   }
-
-  // 화면 상단으로 이동
   window.scrollTo({ top: 0, behavior: "smooth" });
+});
+
+/* ★ Enter(완료) 키: 계산 실행 + 화면 상단 이동 */
+document.getElementById("received").addEventListener("keydown", function(e) {
+  if (e.key === "Enter") {
+    calcChange();
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  }
 });
 </script>
 
