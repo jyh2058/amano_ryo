@@ -82,6 +82,10 @@
     計算
   </button>
 
+  <button class="btn btn-success flex-shrink-0" style="padding:8px 14px;" onclick="setExactAmount()">
+    ちょうど
+  </button>
+
 </div>
 
 <!-- 거스름돈 -->
@@ -242,6 +246,22 @@ document.getElementById("received").addEventListener("keydown", function(e) {
     window.scrollTo({ top: 0, behavior: "smooth" });
   }
 });
+
+function setExactAmount() {
+  const total = calcTotal();
+
+  // 합계가 0이면 수량 입력 메시지
+  if (total === 0) {
+    document.getElementById("change").textContent = "数量を入力してください。";
+    return;
+  }
+
+  // 받은 금액 칸에 합계 입력
+  document.getElementById("received").value = total.toLocaleString();
+
+  // 계산 실행
+  calcChange();
+}
 </script>
 
 </body>
