@@ -175,6 +175,9 @@ function calcChange() {
   }
 
   saveHistory(received, total);
+
+  // ★ 숫자 키보드 닫힌 후 화면이 아래로 밀리는 문제 해결
+  window.scrollTo({ top: 0, behavior: "smooth" });
 }
 
 function resetAll() {
