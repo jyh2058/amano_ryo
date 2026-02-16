@@ -130,7 +130,7 @@ products.forEach((p, idx) => {
   row.className = "item";
   row.innerHTML = `
     <div class="name">${p.name}</div>
-    <div class="price">${p.price}円</div>
+    <div class="price">${p.price.toLocaleString()}円</div>
     <div class="qty">
       <button onclick="changeQty(${idx}, -1)">-</button>
       <span id="qty${idx}">0</span>
@@ -176,7 +176,7 @@ function calcChange() {
 
   saveHistory(received, total);
 
-  // ★ 숫자 키보드 닫힌 후 화면이 아래로 밀리는 문제 해결
+  // ★ 계산 후 자동으로 화면 상단으로 이동
   window.scrollTo({ top: 0, behavior: "smooth" });
 }
 
@@ -193,8 +193,7 @@ function saveHistory(received, total) {
   historyCount++;
 
   const time = new Date().toLocaleTimeString("ja-JP", { hour12: false });
-
-  const change = received - total;  // ← 거스름돈 계산 추가
+  const change = received - total;
 
   let qtyList = "";
   products.forEach((p, i) => {
@@ -224,7 +223,7 @@ function deleteHistory(id) {
   if (item) item.remove();
 }
 
-// ★ 숫자 키보드 '완료' 눌렀을 때도 계산 + 스크롤 위로 이동
+// ★ 숫자 키보드 '완료(Enter)' 눌렀을 때도 계산 + 스크롤 위로 이동
 document.getElementById("received").addEventListener("keydown", function(e) {
   if (e.key === "Enter") {
     calcChange();
