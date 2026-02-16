@@ -278,10 +278,10 @@ function downloadTXT() {
   let text = "";
 
   historyItems.forEach(item => {
-    const lines = item.innerText.split("\n");
-    lines.forEach(line => {
-      text += line + "\n";
-    });
+    // 삭제 버튼 텍스트 제거
+    let cleaned = item.innerText.replace("削除", "").trim();
+
+    text += cleaned + "\n";
     text += "------------------------------\n";
   });
 
