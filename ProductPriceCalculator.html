@@ -169,9 +169,9 @@ function calcChange() {
   }
 
   if (change < 0) {
-    document.getElementById("change").textContent = `不足: ${Math.abs(change)}円`;
+    document.getElementById("change").textContent = `不足: ${Math.abs(change).toLocaleString()}円`;
   } else {
-    document.getElementById("change").textContent = `お釣り: ${change}円`;
+    document.getElementById("change").textContent = `お釣り: ${change.toLocaleString()}円`;
   }
 
   saveHistory(received, total);
@@ -209,9 +209,9 @@ function saveHistory(received, total) {
   div.innerHTML = `
     <div><strong>No.${historyCount}</strong></div>
     <div><strong>時間:</strong> ${time}</div>
-    <div><strong>受取:</strong> ${received}円</div>
-    <div><strong>合計:</strong> ${total}円</div>
-    <div><strong>お釣り:</strong> ${change}円</div>   <!-- ★ 추가된 부분 -->
+    <div><strong>受取:</strong> ${received.toLocaleString()}円</div>
+    <div><strong>合計:</strong> ${total.toLocaleString()}円</div>
+    <div><strong>お釣り:</strong> ${change.toLocaleString()}円</div>
     <div><strong>数量:</strong> ${qtyList}</div>
     <button class="delete-btn" onclick="deleteHistory(${historyCount})">削除</button>
   `;
