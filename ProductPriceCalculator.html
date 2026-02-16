@@ -24,17 +24,12 @@
     min-height: 1.4em;
   }
 
-  .delete-btn {
-    padding: 3px 8px;
-    font-size: 0.8em;
+  .qty-buttons {
+    white-space: nowrap;
   }
 
   button {
     touch-action: manipulation;
-  }
-
-  .qty-buttons {
-    white-space: nowrap;
   }
 </style>
 </head>
@@ -59,8 +54,9 @@
 <!-- 합계 -->
 <div id="total" class="mt-3">合計: 0円</div>
 
+<!-- 받은 금액 (한 줄 구성) -->
 <div class="d-flex align-items-center flex-nowrap mt-3" style="gap:6px;">
-  <span class="flex-shrink-0" style="font-size:1.2em; font-weight:bold;">受取金額:</span>
+  <span id="receivedLabel" class="flex-shrink-0">受取金額:</span>
 
   <input 
     type="text"
@@ -114,7 +110,6 @@ products.forEach((p, idx) => {
       </button>
     </div>
   `;
-  
   itemsDiv.appendChild(row);
 });
 
@@ -142,14 +137,22 @@ function getReceivedValue() {
 }
 
 function calcChange() {
-  const received = getReceivedValue();
   const total = calcTotal();
-  const change = received - total;
+  const received = getReceivedValue();
 
+  // ★ 1) 수량 체크 (우선순위 1)
+  if (total === 0) {
+    document.getElementById("change").textContent = "数量を入力してください。";
+    return;
+  }
+
+  // ★ 2) 받은 금액 체크 (우선순위 2)
   if (received === 0) {
     document.getElementById("change").textContent = "受取金額を入力してください。";
     return;
   }
+
+  const change = received - total;
 
   if (change < 0) {
     document.getElementById("change").textContent = `不足: ${Math.abs(change).toLocaleString()}円`;
@@ -210,17 +213,16 @@ document.getElementById("received").addEventListener("focus", function () {
   this.value = this.value.replace(/,/g, "");
 });
 
-/* 포커스 아웃: 콤마 적용 + 자동 계산 + 화면 상단 이동 */
+/* 포커스 아웃: 콤마 적용 + 스크롤 이동 (계산은 안 함) */
 document.getElementById("received").addEventListener("blur", function () {
   let v = this.value.replace(/,/g, "");
   if (v !== "" && !isNaN(v)) {
     this.value = Number(v).toLocaleString();
   }
-
   window.scrollTo({ top: 0, behavior: "smooth" });
 });
 
-/* Enter(완료) 키 */
+/* Enter(완료) 키 → 계산 */
 document.getElementById("received").addEventListener("keydown", function(e) {
   if (e.key === "Enter") {
     calcChange();
