@@ -94,6 +94,9 @@
 <!-- 이력 -->
 <div id="history" class="mt-4">
   <h3>計算履歴</h3>
+  <button class="btn btn-secondary btn-sm mt-2" onclick="downloadTXT()">
+    TXTダウンロード
+  </button>
   <div id="historyList"></div>
 </div>
 
@@ -261,6 +264,37 @@ function setExactAmount() {
 
   // 계산 실행
   calcChange();
+}
+
+function downloadTXT() {
+  const historyItems = document.querySelectorAll(".history-item");
+  if (historyItems.length === 0) {
+    alert("ダウンロードする履歴がありません。");
+    return;
+  }
+
+  let text = "";
+
+  historyItems.forEach(item => {
+    const lines = item.innerText.split("\n");
+    lines.forEach(line => {
+      text += line + "\n";
+    });
+    text += "------------------------------\n";
+  });
+
+  const blob = new Blob([text], { type: "text/plain" });
+  const url = URL.createObjectURL(blob);
+
+  const a = document.createElement("a");
+  const now = new Date();
+  const filename = `history_${now.getFullYear()}-${now.getMonth()+1}-${now.getDate()}_${now.getHours()}${now.getMinutes()}${now.getSeconds()}.txt`;
+
+  a.href = url;
+  a.download = filename;
+  a.click();
+
+  URL.revokeObjectURL(url);
 }
 </script>
 
