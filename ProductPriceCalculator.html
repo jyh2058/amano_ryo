@@ -95,8 +95,8 @@
 <div class="d-flex justify-content-between align-items-center mt-4">
   <h3 class="m-0">計算履歴</h3>
 
-  <button class="btn btn-secondary btn-sm px-2 py-1" onclick="downloadTXT()">
-    テキストファイルダウンロード
+  <button class="btn btn-success btn-sm px-2 py-1" onclick="shareLine()">
+    履歴をLINEで共有
   </button>
 </div>
 
@@ -268,35 +268,22 @@ function setExactAmount() {
   calcChange();
 }
 
-function downloadTXT() {
+function shareLine() {
   const historyItems = document.querySelectorAll(".history-item");
   if (historyItems.length === 0) {
-    alert("ダウンロードする履歴がありません。");
+    alert("共有する履歴がありません。");
     return;
   }
 
   let text = "";
 
   historyItems.forEach(item => {
-    // 삭제 버튼 텍스트 제거
     let cleaned = item.innerText.replace("削除", "").trim();
-
-    text += cleaned + "\n";
-    text += "------------------------------\n";
+    text += cleaned + "\n------------------------------\n";
   });
 
-  const blob = new Blob([text], { type: "text/plain" });
-  const url = URL.createObjectURL(blob);
-
-  const a = document.createElement("a");
-  const now = new Date();
-  const filename = `history_${now.getFullYear()}-${now.getMonth()+1}-${now.getDate()}_${now.getHours()}${now.getMinutes()}${now.getSeconds()}.txt`;
-
-  a.href = url;
-  a.download = filename;
-  a.click();
-
-  URL.revokeObjectURL(url);
+  const encoded = encodeURIComponent(text);
+  window.location.href = `line://msg/text/${encoded}`;
 }
 </script>
 
