@@ -5,38 +5,31 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>グッズ販売</title>
 
-<!-- Bootstrap 5 -->
 <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
-
-<!-- Font Awesome -->
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
 
 <style>
-  body { font-family: sans-serif; padding: 5px; }
+  body { font-family: sans-serif; padding: 20px; }
 
   #total, #change {
     font-size: 1.4em;
     font-weight: bold;
     margin-top: 15px;
   }
-  
+
   #receivedLabel {
     font-size: 1.4em;
     font-weight: bold;
-    margin-top: 0;   /* ← 여기! */
+    margin-top: 0;
+    height: 38px;
   }
 
   #change {
     min-height: 1.4em;
   }
 
-  .qty-buttons {
-    white-space: nowrap;
-  }
-
-  button {
-    touch-action: manipulation;
-  }
+  .qty-buttons { white-space: nowrap; }
+  button { touch-action: manipulation; }
 </style>
 </head>
 <body>
@@ -60,12 +53,10 @@
 <!-- 합계 -->
 <div id="total" class="mt-3">合計: 0円</div>
 
-<!-- 받은 금액 (한 줄 구성) -->
-<div class="d-flex align-items-center flex-nowrap mt-2" style="gap:6px;">
+<!-- 받은 금액 -->
+<div class="d-flex align-items-center flex-nowrap mt-3" style="gap:6px;">
 
-  <div id="receivedLabel"
-       class="d-flex align-items-center flex-shrink-0"
-       style="font-size:1.4em; font-weight:bold; height:38px;">
+  <div id="receivedLabel" class="d-flex align-items-center flex-shrink-0">
     受取金額:
   </div>
 
@@ -78,20 +69,16 @@
     style="max-width: 100px; font-size:16px;"
   >
 
-  <button class="btn btn-primary flex-shrink-0" style="padding:8px 14px;" onclick="calcChange()">
-    計算
-  </button>
+  <button class="btn btn-primary flex-shrink-0" onclick="calcChange()">計算</button>
 
-  <button class="btn btn-success flex-shrink-0" style="padding:8px 14px;" onclick="setExactAmount()">
-    ちょうど
-  </button>
+  <button class="btn btn-success flex-shrink-0" onclick="setExactAmount()">ちょうど</button>
 
 </div>
 
 <!-- 거스름돈 -->
 <div id="change" class="mt-2"></div>
 
-<!-- 이력 -->
+<!-- 이력 + LINE 공유 버튼 -->
 <div class="d-flex justify-content-between align-items-center mt-4">
   <h3 class="m-0">計算履歴</h3>
 
@@ -103,6 +90,7 @@
 <div id="historyList"></div>
 
 <script>
+let historyArray = [];
 let historyCount = 0;
 
 const products = [
@@ -161,13 +149,11 @@ function calcChange() {
   const total = calcTotal();
   const received = getReceivedValue();
 
-  // ★ 1) 수량 체크 (우선순위 1)
   if (total === 0) {
     document.getElementById("change").textContent = "数量を入力してください。";
     return;
   }
 
-  // ★ 2) 받은 금액 체크 (우선순위 2)
   if (received === 0) {
     document.getElementById("change").textContent = "受取金額を入力してください。";
     return;
@@ -176,15 +162,28 @@ function calcChange() {
   const change = received - total;
 
   if (change < 0) {
-    document.getElementById("change").textContent = `不足: ${Math.abs(change).toLocaleString()}円`;
+    document.getElementById("change").textContent =
+      `不足: ${Math.abs(change).toLocaleString()}円`;
     return;
-  } else {
-    document.getElementById("change").textContent = `お釣り: ${change.toLocaleString()}円`;
   }
 
-  saveHistory(received, total);
+  document.getElementById("change").textContent =
+    `お釣り: ${change.toLocaleString()}円`;
 
+  saveHistory(received, total);
   window.scrollTo({ top: 0, behavior: "smooth" });
+}
+
+function setExactAmount() {
+  const total = calcTotal();
+
+  if (total === 0) {
+    document.getElementById("change").textContent = "数量を入力してください。";
+    return;
+  }
+
+  document.getElementById("received").value = total.toLocaleString();
+  calcChange();
 }
 
 function resetAll() {
@@ -202,32 +201,86 @@ function saveHistory(received, total) {
   const time = new Date().toLocaleTimeString("ja-JP", { hour12: false });
   const change = received - total;
 
-  let qtyList = "";
+  const qtyObj = {};
   products.forEach((p, i) => {
-    const qty = parseInt(document.getElementById("qty" + i).textContent);
-    qtyList += `${p.name}: ${qty}　`;
+    qtyObj[p.name] = parseInt(document.getElementById("qty" + i).textContent);
   });
 
-  const div = document.createElement("div");
-  div.className = "history-item mt-3";
-  div.id = "history-" + historyCount;
+  const entry = {
+    id: historyCount,
+    time,
+    received,
+    total,
+    change,
+    qty: qtyObj
+  };
 
-  div.innerHTML = `
-    <div><strong>No.${historyCount}</strong></div>
-    <div><strong>時間:</strong> ${time}</div>
-    <div><strong>受取:</strong> ${received.toLocaleString()}円</div>
-    <div><strong>合計:</strong> ${total.toLocaleString()}円</div>
-    <div><strong>お釣り:</strong> ${change.toLocaleString()}円</div>
-    <div><strong>数量:</strong> ${qtyList}</div>
-    <button class="btn btn-sm btn-outline-danger delete-btn" onclick="deleteHistory(${historyCount})">削除</button>
-  `;
+  historyArray.unshift(entry);
+  localStorage.setItem("historyData", JSON.stringify(historyArray));
 
-  document.getElementById("historyList").prepend(div);
+  renderHistory();
+}
+
+function renderHistory() {
+  const list = document.getElementById("historyList");
+  list.innerHTML = "";
+
+  historyArray.forEach(entry => {
+    const div = document.createElement("div");
+    div.className = "history-item mt-3";
+    div.id = "history-" + entry.id;
+
+    let qtyList = "";
+    for (const key in entry.qty) {
+      qtyList += `${key}: ${entry.qty[key]}　`;
+    }
+
+    div.innerHTML = `
+      <div><strong>No.${entry.id}</strong></div>
+      <div><strong>時間:</strong> ${entry.time}</div>
+      <div><strong>受取:</strong> ${entry.received.toLocaleString()}円</div>
+      <div><strong>合計:</strong> ${entry.total.toLocaleString()}円</div>
+      <div><strong>お釣り:</strong> ${entry.change.toLocaleString()}円</div>
+      <div><strong>数量:</strong> ${qtyList}</div>
+      <button class="btn btn-sm btn-outline-danger" onclick="deleteHistory(${entry.id})">削除</button>
+    `;
+    list.appendChild(div);
+  });
 }
 
 function deleteHistory(id) {
-  const item = document.getElementById("history-" + id);
-  if (item) item.remove();
+  historyArray = historyArray.filter(e => e.id !== id);
+  localStorage.setItem("historyData", JSON.stringify(historyArray));
+  renderHistory();
+}
+
+function shareLine() {
+  if (historyArray.length === 0) {
+    alert("共有する履歴がありません。");
+    return;
+  }
+
+  let text = "";
+
+  historyArray.forEach(entry => {
+    let qtyList = "";
+    for (const key in entry.qty) {
+      qtyList += `${key}:${entry.qty[key]} `;
+    }
+
+    text +=
+`No.${entry.id}
+時間: ${entry.time}
+受取: ${entry.received}円
+合計: ${entry.total}円
+お釣り: ${entry.change}円
+数量: ${qtyList}
+------------------------------
+`;
+  });
+
+  const encoded = encodeURIComponent(text);
+  window.location.href = `line://msg/text/${encoded}`;
 }
 
 /* 포커스 인: 콤마 제거 */
@@ -235,16 +288,15 @@ document.getElementById("received").addEventListener("focus", function () {
   this.value = this.value.replace(/,/g, "");
 });
 
-/* 포커스 아웃: 콤마 적용 + 스크롤 이동 (계산은 안 함) */
+/* 포커스 아웃: 콤마 적용 */
 document.getElementById("received").addEventListener("blur", function () {
   let v = this.value.replace(/,/g, "");
   if (v !== "" && !isNaN(v)) {
     this.value = Number(v).toLocaleString();
   }
-  window.scrollTo({ top: 0, behavior: "smooth" });
 });
 
-/* Enter(완료) 키 → 계산 */
+/* Enter → 계산 */
 document.getElementById("received").addEventListener("keydown", function(e) {
   if (e.key === "Enter") {
     calcChange();
@@ -252,39 +304,15 @@ document.getElementById("received").addEventListener("keydown", function(e) {
   }
 });
 
-function setExactAmount() {
-  const total = calcTotal();
-
-  // 합계가 0이면 수량 입력 메시지
-  if (total === 0) {
-    document.getElementById("change").textContent = "数量を入力してください。";
-    return;
+/* 페이지 로드 시 localStorage 복원 */
+window.onload = () => {
+  const saved = localStorage.getItem("historyData");
+  if (saved) {
+    historyArray = JSON.parse(saved);
+    historyCount = historyArray.length > 0 ? historyArray[0].id : 0;
+    renderHistory();
   }
-
-  // 받은 금액 칸에 합계 입력
-  document.getElementById("received").value = total.toLocaleString();
-
-  // 계산 실행
-  calcChange();
-}
-
-function shareLine() {
-  const historyItems = document.querySelectorAll(".history-item");
-  if (historyItems.length === 0) {
-    alert("共有する履歴がありません。");
-    return;
-  }
-
-  let text = "";
-
-  historyItems.forEach(item => {
-    let cleaned = item.innerText.replace("削除", "").trim();
-    text += cleaned + "\n------------------------------\n";
-  });
-
-  const encoded = encodeURIComponent(text);
-  window.location.href = `line://msg/text/${encoded}`;
-}
+};
 </script>
 
 </body>
