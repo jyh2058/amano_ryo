@@ -339,20 +339,17 @@ function updateSummary() {
     }
   });
 
-  let qtyHtml = "<strong>商品別販売数量:</strong><br>";
-  for (const name in productQtyTotals) {
-    qtyHtml += `${name}: ${productQtyTotals[name]}個<br>`;
-  }
-  document.getElementById("productQty").innerHTML = qtyHtml;
-
-  let salesHtml = "<strong>商品別売上:</strong><br>";
-  for (const name in productSalesTotals) {
-    salesHtml += `${name}: ${productSalesTotals[name].toLocaleString()}円<br>`;
-  }
-  document.getElementById("productSales").innerHTML = salesHtml;
-
+  // 총 판매금액을 제일 위에 표시
   document.getElementById("totalSales").innerHTML =
     `<strong>総売上金額:</strong> ${totalSales.toLocaleString()}円`;
+
+  // 상품별 수량 + 금액을 한 줄로 묶어서 표시
+  let html = "<strong>商品別販売:</strong><br>";
+  for (const name in productQtyTotals) {
+    html += `${name}: ${productQtyTotals[name]}個 / ${productSalesTotals[name].toLocaleString()}円<br>`;
+  }
+
+  document.getElementById("productQty").innerHTML = html;
 }
 
 /* 포커스 인: 콤마 제거 */
