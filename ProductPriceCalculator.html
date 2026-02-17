@@ -24,10 +24,6 @@
     height: 38px;
   }
 
-  #change {
-    min-height: 1.4em;
-  }
-
   .qty-buttons { white-space: nowrap; }
   button { touch-action: manipulation; }
 </style>
@@ -78,7 +74,15 @@
 <!-- 거스름돈 -->
 <div id="change" class="mt-2"></div>
 
-<!-- 이력 + LINE 공유 버튼 -->
+<!-- 판매 집계 (이력보다 위) -->
+<h3 class="mt-4">販売集計</h3>
+<div id="summaryBox" class="mt-2 p-2 border rounded">
+  <div id="totalQty">総販売数量: 0</div>
+  <div id="totalSales">総売上金額: 0円</div>
+  <div id="productSales"></div>
+</div>
+
+<!-- 이력 + LINE 공유 + 전체 삭제 -->
 <div class="d-flex justify-content-between align-items-center mt-4">
   <h3 class="m-0">計算履歴</h3>
 
@@ -225,6 +229,7 @@ function saveHistory(received, total) {
   localStorage.setItem("historyData", JSON.stringify(historyArray));
 
   renderHistory();
+  updateSummary();
 }
 
 function renderHistory() {
@@ -258,6 +263,19 @@ function deleteHistory(id) {
   historyArray = historyArray.filter(e => e.id !== id);
   localStorage.setItem("historyData", JSON.stringify(historyArray));
   renderHistory();
+  updateSummary();
+}
+
+function clearAllHistory() {
+  if (!confirm("すべての履歴を削除しますか？")) return;
+
+  historyArray = [];
+  historyCount = 0;
+
+  localStorage.removeItem("historyData");
+
+  renderHistory();
+  updateSummary();
 }
 
 function shareLine() {
@@ -275,18 +293,61 @@ function shareLine() {
     }
 
     text +=
-`No.${entry.id}
-時間: ${entry.time}
-受取: ${entry.received}円
-合計: ${entry.total}円
-お釣り: ${entry.change}円
-数量: ${qtyList}
-------------------------------
+`----------------------------------------
+ No: ${entry.id}
+ 時間: ${entry.time}
+ 受取: ${entry.received}円
+ 合計: ${entry.total}円
+ お釣り: ${entry.change}円
+----------------------------------------
+ ${qtyList}
+----------------------------------------
+
 `;
   });
 
   const encoded = encodeURIComponent(text);
   window.location.href = `line://msg/text/${encoded}`;
+}
+
+function updateSummary() {
+  if (historyArray.length === 0) {
+    document.getElementById("totalQty").textContent = "総販売数量: 0";
+    document.getElementById("totalSales").textContent = "総売上金額: 0円";
+    document.getElementById("productSales").innerHTML = "";
+    return;
+  }
+
+  let totalQty = 0;
+  let totalSales = 0;
+
+  let productTotals = {};
+  products.forEach(p => productTotals[p.name] = 0);
+
+  historyArray.forEach(entry => {
+    totalSales += entry.total;
+
+    for (const name in entry.qty) {
+      const qty = entry.qty[name];
+      totalQty += qty;
+
+      const price = products.find(p => p.name === name).price;
+      productTotals[name] += qty * price;
+    }
+  });
+
+  document.getElementById("totalQty").textContent =
+    `総販売数量: ${totalQty.toLocaleString()}`;
+
+  document.getElementById("totalSales").textContent =
+    `総売上金額: ${totalSales.toLocaleString()}円`;
+
+  let html = "<strong>商品別売上:</strong><br>";
+  for (const name in productTotals) {
+    html += `${name}: ${productTotals[name].toLocaleString()}円<br>`;
+  }
+
+  document.getElementById("productSales").innerHTML = html;
 }
 
 /* 포커스 인: 콤마 제거 */
@@ -317,19 +378,9 @@ window.onload = () => {
     historyArray = JSON.parse(saved);
     historyCount = historyArray.length > 0 ? historyArray[0].id : 0;
     renderHistory();
+    updateSummary();
   }
 };
-
-function clearAllHistory() {
-  if (!confirm("すべての履歴を削除しますか？")) return;
-
-  historyArray = [];
-  historyCount = 0;
-
-  localStorage.removeItem("historyData");
-
-  renderHistory();
-}
 </script>
 
 </body>
