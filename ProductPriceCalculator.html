@@ -33,7 +33,7 @@
 <!-- 상단 바 -->
 <div class="d-flex justify-content-between align-items-center mb-3">
   <h2 class="m-0">グッズ販売</h2>
-  <button id="resetBtn" class="btn btn-danger" onclick="resetAll()">すべてクリア</button>
+  <button id="resetBtn" class="btn btn-danger" onclick="resetAll()">計算内容を消去</button>
 </div>
 
 <!-- 상품 헤더 -->
@@ -279,7 +279,10 @@ function clearAllHistory() {
   localStorage.removeItem("historyData");
 
   renderHistory();
-  updateSummary();
+
+  // ⭐ 집계 영역도 완전히 초기화
+  document.getElementById("totalSales").innerHTML = "総売上金額: 0円";
+  document.getElementById("productQty").innerHTML = "";
 }
 
 function shareLine() {
