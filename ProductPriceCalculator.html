@@ -17,6 +17,12 @@
     margin-top: 15px;
   }
 
+  #change {
+    min-height: 28px; /* ⭐ 거스름돈 영역 확보 */
+    display: flex;
+    align-items: center;
+  }
+
   #receivedLabel {
     font-size: 1.4em;
     font-weight: bold;
@@ -74,12 +80,12 @@
 <!-- 거스름돈 -->
 <div id="change" class="mt-2"></div>
 
-<!-- 판매 집계 (이력보다 위) -->
+<!-- 판매 집계 -->
 <h3 class="mt-4">販売集計</h3>
 <div id="summaryBox" class="mt-2 p-2 border rounded">
 
   <!-- ⭐ 총 판매금액을 가장 위로 -->
-  <div id="totalSales" class="mb-2"></div>
+  <div id="totalSales" class="mb-2"><strong>総売上金額:</strong> 0円</div>
 
   <!-- ⭐ 상품별 판매수량 + 판매금액 묶음 -->
   <div id="productQty"></div>
@@ -280,8 +286,8 @@ function clearAllHistory() {
 
   renderHistory();
 
-  // ⭐ 집계 영역도 완전히 초기화
-  document.getElementById("totalSales").innerHTML = "総売上金額: 0円";
+  // ⭐ 집계 완전 초기화 (productSales 잔여 문제 해결)
+  document.getElementById("totalSales").innerHTML = "<strong>総売上金額:</strong> 0円";
   document.getElementById("productQty").innerHTML = "";
 }
 
@@ -319,9 +325,8 @@ function shareLine() {
 
 function updateSummary() {
   if (historyArray.length === 0) {
+    document.getElementById("totalSales").innerHTML = "<strong>総売上金額:</strong> 0円";
     document.getElementById("productQty").innerHTML = "";
-    document.getElementById("productSales").innerHTML = "";
-    document.getElementById("totalSales").innerHTML = "総売上金額: 0円";
     return;
   }
 
@@ -346,11 +351,9 @@ function updateSummary() {
     }
   });
 
-  // 총 판매금액을 제일 위에 표시
   document.getElementById("totalSales").innerHTML =
     `<strong>総売上金額:</strong> ${totalSales.toLocaleString()}円`;
 
-  // 상품별 수량 + 금액을 한 줄로 묶어서 표시
   let html = "<strong>商品別販売:</strong><br>";
   for (const name in productQtyTotals) {
     html += `${name}: ${productQtyTotals[name]}個 / ${productSalesTotals[name].toLocaleString()}円<br>`;
