@@ -97,13 +97,12 @@
 let historyArray = [];
 let historyCount = 0;
 
+/* ⭐ 상품 목록 (신규 4종 포함) */
 const products = [
   { name: "上諏訪の女", price: 1250 },
   { name: "捨てちまえ", price: 1350 },
   { name: "衿子", price: 1500 },
   { name: "天野涼 ペンライト", price: 3000 },
-
-  /* ⭐ 신규 추가 상품 */
   { name: "電池(3本)", price: 100 },
   { name: "3/12大井町きゅりあんチケット", price: 4500 },
   { name: "3/18栃木野木チケット", price: 4500 },
@@ -112,6 +111,7 @@ const products = [
 
 const itemsDiv = document.getElementById("items");
 
+/* 상품 리스트 생성 */
 products.forEach((p, idx) => {
   const row = document.createElement("div");
   row.className = "row align-items-center mb-2";
@@ -277,13 +277,50 @@ function clearAllHistory() {
   document.getElementById("productQty").innerHTML = "";
 }
 
+/* ⭐ LINE 공유 시 집계 포함 */
 function shareLine() {
   if (historyArray.length === 0) {
     alert("共有する履歴がありません。");
     return;
   }
 
-  let text = "";
+  /* 집계 계산 */
+  let productQtyTotals = {};
+  let productSalesTotals = {};
+  let totalSales = 0;
+
+  products.forEach(p => {
+    productQtyTotals[p.name] = 0;
+    productSalesTotals[p.name] = 0;
+  });
+
+  historyArray.forEach(entry => {
+    totalSales += entry.total;
+
+    for (const name in entry.qty) {
+      const qty = entry.qty[name];
+      const price = products.find(p => p.name === name).price;
+
+      productQtyTotals[name] += qty;
+      productSalesTotals[name] += qty * price;
+    }
+  });
+
+  /* 집계 텍스트 */
+  let summaryText =
+`==============================
+【販売集計】
+総売上金額: ${totalSales.toLocaleString()}円
+`;
+
+  for (const name in productQtyTotals) {
+    summaryText += `${name}: ${productQtyTotals[name]}個 / ${productSalesTotals[name].toLocaleString()}円\n`;
+  }
+
+  summaryText += "==============================\n\n\n";
+
+  /* 이력 텍스트 */
+  let historyText = "";
 
   historyArray.forEach(entry => {
     let qtyList = "";
@@ -291,7 +328,7 @@ function shareLine() {
       qtyList += `${key}:${entry.qty[key]} `;
     }
 
-    text +=
+    historyText +=
 `----------------------------------------
  No: ${entry.id}
  時間: ${entry.time}
@@ -305,7 +342,8 @@ function shareLine() {
 `;
   });
 
-  const encoded = encodeURIComponent(text);
+  /* LINE 공유 */
+  const encoded = encodeURIComponent(summaryText + historyText);
   window.location.href = `line://msg/text/${encoded}`;
 }
 
