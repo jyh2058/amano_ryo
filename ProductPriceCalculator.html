@@ -18,7 +18,7 @@
   }
 
   #change {
-    min-height: 28px; /* ⭐ 거스름돈 영역 확보 */
+    min-height: 28px;
     display: flex;
     align-items: center;
   }
@@ -26,7 +26,6 @@
   #receivedLabel {
     font-size: 1.4em;
     font-weight: bold;
-    margin-top: 0;
     height: 38px;
   }
 
@@ -57,10 +56,7 @@
 
 <!-- 받은 금액 -->
 <div class="d-flex align-items-center flex-nowrap mt-3" style="gap:6px;">
-
-  <div id="receivedLabel" class="d-flex align-items-center flex-shrink-0">
-    受取金額:
-  </div>
+  <div id="receivedLabel" class="d-flex align-items-center flex-shrink-0">受取金額:</div>
 
   <input 
     type="text"
@@ -72,9 +68,7 @@
   >
 
   <button class="btn btn-primary flex-shrink-0" onclick="calcChange()">計算</button>
-
   <button class="btn btn-success flex-shrink-0" onclick="setExactAmount()">ちょうど</button>
-
 </div>
 
 <!-- 거스름돈 -->
@@ -83,13 +77,8 @@
 <!-- 판매 집계 -->
 <h3 class="mt-4">販売集計</h3>
 <div id="summaryBox" class="mt-2 p-2 border rounded">
-
-  <!-- ⭐ 총 판매금액을 가장 위로 -->
   <div id="totalSales" class="mb-2"><strong>総売上金額:</strong> 0円</div>
-
-  <!-- ⭐ 상품별 판매수량 + 판매금액 묶음 -->
   <div id="productQty"></div>
-
 </div>
 
 <!-- 이력 + LINE 공유 + 전체 삭제 -->
@@ -97,13 +86,8 @@
   <h3 class="m-0">計算履歴</h3>
 
   <div class="d-flex gap-2">
-    <button class="btn btn-success btn-sm px-2 py-1" onclick="shareLine()">
-      履歴をLINEで共有
-    </button>
-
-    <button class="btn btn-danger btn-sm px-2 py-1" onclick="clearAllHistory()">
-      全削除
-    </button>
+    <button class="btn btn-success btn-sm px-2 py-1" onclick="shareLine()">履歴をLINEで共有</button>
+    <button class="btn btn-danger btn-sm px-2 py-1" onclick="clearAllHistory()">全削除</button>
   </div>
 </div>
 
@@ -117,7 +101,13 @@ const products = [
   { name: "上諏訪の女", price: 1250 },
   { name: "捨てちまえ", price: 1350 },
   { name: "衿子", price: 1500 },
-  { name: "天野涼 ペンライト", price: 3000 }
+  { name: "天野涼 ペンライト", price: 3000 },
+
+  /* ⭐ 신규 추가 상품 */
+  { name: "電池(3本)", price: 100 },
+  { name: "3/12大井町きゅりあんチケット", price: 4500 },
+  { name: "3/18栃木野木チケット", price: 4500 },
+  { name: "4/21神奈川港南チケット", price: 4500 }
 ];
 
 const itemsDiv = document.getElementById("items");
@@ -196,12 +186,10 @@ function calcChange() {
 
 function setExactAmount() {
   const total = calcTotal();
-
   if (total === 0) {
     document.getElementById("change").textContent = "数量を入力してください。";
     return;
   }
-
   document.getElementById("received").value = total.toLocaleString();
   calcChange();
 }
@@ -249,7 +237,6 @@ function renderHistory() {
   historyArray.forEach(entry => {
     const div = document.createElement("div");
     div.className = "history-item mt-3";
-    div.id = "history-" + entry.id;
 
     let qtyList = "";
     for (const key in entry.qty) {
@@ -286,7 +273,6 @@ function clearAllHistory() {
 
   renderHistory();
 
-  // ⭐ 집계 완전 초기화 (productSales 잔여 문제 해결)
   document.getElementById("totalSales").innerHTML = "<strong>総売上金額:</strong> 0円";
   document.getElementById("productQty").innerHTML = "";
 }
@@ -362,12 +348,11 @@ function updateSummary() {
   document.getElementById("productQty").innerHTML = html;
 }
 
-/* 포커스 인: 콤마 제거 */
+/* 콤마 처리 */
 document.getElementById("received").addEventListener("focus", function () {
   this.value = this.value.replace(/,/g, "");
 });
 
-/* 포커스 아웃: 콤마 적용 */
 document.getElementById("received").addEventListener("blur", function () {
   let v = this.value.replace(/,/g, "");
   if (v !== "" && !isNaN(v)) {
