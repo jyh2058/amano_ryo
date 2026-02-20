@@ -60,6 +60,22 @@
     </div>
   </div>
 
+</div>
+
+<!-- Total -->
+<div id="total" class="mt-3">合計: 0円</div>
+
+<!-- Received -->
+<div class="d-flex align-items-center flex-nowrap mt-3" style="gap:6px;">
+  <div id="receivedLabel" class="d-flex align-items-center flex-shrink-0">受取金額:</div>
+  <input type="text" id="received" inputmode="numeric" pattern="[0-9]*" class="form-control flex-shrink-1" style="max-width: 100px; font-size:16px;">
+  <button class="btn btn-primary flex-shrink-0" onclick="calcChange()">計算</button>
+  <button class="btn btn-success flex-shrink-0" onclick="setExactAmount()">ちょうど</button>
+</div>
+
+<!-- Change -->
+<div id="change" class="mt-2"></div>
+
   <!-- 販売集計 -->
   <div class="accordion-item">
     <h2 class="accordion-header" id="headingSummary">
@@ -90,22 +106,6 @@
       </div>
     </div>
   </div>
-
-</div>
-
-<!-- Total -->
-<div id="total" class="mt-3">合計: 0円</div>
-
-<!-- Received -->
-<div class="d-flex align-items-center flex-nowrap mt-3" style="gap:6px;">
-  <div id="receivedLabel" class="d-flex align-items-center flex-shrink-0">受取金額:</div>
-  <input type="text" id="received" inputmode="numeric" pattern="[0-9]*" class="form-control flex-shrink-1" style="max-width: 100px; font-size:16px;">
-  <button class="btn btn-primary flex-shrink-0" onclick="calcChange()">計算</button>
-  <button class="btn btn-success flex-shrink-0" onclick="setExactAmount()">ちょうど</button>
-</div>
-
-<!-- Change -->
-<div id="change" class="mt-2"></div>
 
 <!-- Buttons -->
 <div class="d-flex gap-2 mt-3">
