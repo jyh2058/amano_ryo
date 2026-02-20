@@ -514,4 +514,41 @@ document.getElementById("received").addEventListener("blur", function () {
 
 /* Enter → 계산 */
 document.getElementById("received").addEventListener("keydown", function(e) {
-  if (e.key
+  if (e.key === "Enter") {
+    calcChange();
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  }
+});
+
+/* 페이지 로드 시 localStorage 복원 */
+window.onload = () => {
+  const saved = localStorage.getItem("historyData");
+  if (saved) {
+    historyArray = JSON.parse(saved);
+    historyCount = historyArray.length > 0 ? historyArray[0].id : 0;
+    renderHistory();
+    updateSummary();
+  }
+};
+
+/* ⭐ 접기/열기 기능 (에러 원인 부분 — 반드시 포함해야 함) */
+function toggleSection(id) {
+  const section = document.getElementById(id);
+  const arrow = document.getElementById(
+    id === "summaryContent" ? "summaryArrow" :
+    id === "historyContent" ? "historyArrow" :
+    id === "extraProducts" ? "extraArrow" : null
+  );
+
+  if (section.style.display === "none") {
+    section.style.display = "block";
+    arrow.textContent = "▲";
+  } else {
+    section.style.display = "none";
+    arrow.textContent = "▼";
+  }
+}
+</script>
+
+</body>
+</html>
