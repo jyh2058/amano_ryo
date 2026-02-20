@@ -78,7 +78,7 @@
   <div id="change" class="flex-grow-1"></div>
 
   <button id="finishBtn" class="btn btn-outline-danger flex-shrink-0"
-          onclick="resetAll()" style="display:none;">
+          onclick="resetAll()" style="visibility:hidden;">
     おわり
   </button>
 </div>
@@ -224,7 +224,7 @@ function calcChange() {
   const finishBtn = document.getElementById("finishBtn");
 
   // 기본적으로 숨김
-  finishBtn.style.display = "none";
+  finishBtn.style.visibility = "hidden";
 
   if (total === 0) {
     document.getElementById("change").textContent = "数量を入力してください。";
@@ -245,7 +245,7 @@ function calcChange() {
   }
 
   // ⭐ 여기서만 おわり 버튼 표시
-  finishBtn.style.display = "block";
+  finishBtn.style.visibility = "visible";
 
   document.getElementById("change").textContent =
     `お釣り: ${change.toLocaleString()}円`;
@@ -268,7 +268,7 @@ function resetAll() {
   extraProducts.forEach((_, i) => document.getElementById("extraQty" + i).textContent = 0);
   document.getElementById("received").value = "";
   document.getElementById("change").textContent = "";
-  finishBtn.style.display = "none";
+  finishBtn.style.visible = "hidden";
   calcTotal();
 }
 
