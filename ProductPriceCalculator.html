@@ -163,9 +163,9 @@ products.forEach((p, idx) => {
     <div class="col-5">${p.name}</div>
     <div class="col-3 text-end">${p.price.toLocaleString()}円</div>
     <div class="col-4 text-end qty-buttons">
-      <button class="btn btn-outline-outline-secondary btn-sm" onclick="changeQty(${idx}, -1)"><i class="fa-solid fa-minus"></i></button>
+      <button class="btn btn-outline-secondary btn-sm" onclick="changeQty(${idx}, -1)"><i class="fa-solid fa-minus"></i></button>
       <span id="qty${idx}" class="mx-2">0</span>
-      <button class="btn btn-outline-outline-secondary btn-sm" onclick="changeQty(${idx}, 1)"><i class="fa-solid fa-plus"></i></button>
+      <button class="btn btn-outline-secondary btn-sm" onclick="changeQty(${idx}, 1)"><i class="fa-solid fa-plus"></i></button>
     </div>`;
   itemsDiv.appendChild(row);
 });
@@ -178,9 +178,9 @@ extraProducts.forEach((p, idx) => {
     <div class="col-5">${p.name}</div>
     <div class="col-3 text-end">${p.price.toLocaleString()}円</div>
     <div class="col-4 text-end qty-buttons">
-      <button class="btn btn-outline-outline-secondary btn-sm" onclick="changeExtraQty(${idx}, -1)"><i class="fa-solid fa-minus"></i></button>
+      <button class="btn btn-outline-secondary btn-sm" onclick="changeExtraQty(${idx}, -1)"><i class="fa-solid fa-minus"></i></button>
       <span id="extraQty${idx}" class="mx-2">0</span>
-      <button class="btn btn-outline-outline-secondary btn-sm" onclick="changeExtraQty(${idx}, 1)"><i class="fa-solid fa-plus"></i></button>
+      <button class="btn btn-outline-secondary btn-sm" onclick="changeExtraQty(${idx}, 1)"><i class="fa-solid fa-plus"></i></button>
     </div>`;
   extraDiv.appendChild(row);
 });
