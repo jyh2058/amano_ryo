@@ -77,7 +77,8 @@
 <div class="d-flex align-items-center mt-2" style="gap:8px;">
   <div id="change" class="flex-grow-1"></div>
 
-  <button class="btn btn-danger btn-sm flex-shrink-0" onclick="resetAll()">
+  <button id="finishBtn" class="btn btn-danger btn-sm flex-shrink-0"
+          onclick="resetAll()" style="display:none;">
     おわり
   </button>
 </div>
@@ -211,18 +212,35 @@ function getReceivedValue() {
 function calcChange() {
   const total = calcTotal();
   const received = getReceivedValue();
+  const finishBtn = document.getElementById("finishBtn");
 
-  if (total === 0) return document.getElementById("change").textContent = "数量を入力してください。";
-  if (received === 0) return document.getElementById("change").textContent = "受取金額を入力してください。";
+  // 기본적으로 숨김
+  finishBtn.style.display = "none";
+
+  if (total === 0) {
+    document.getElementById("change").textContent = "数量を入力してください。";
+    return;
+  }
+
+  if (received === 0) {
+    document.getElementById("change").textContent = "受取金額を入力してください。";
+    return;
+  }
 
   const change = received - total;
 
   if (change < 0) {
-    document.getElementById("change").textContent = `不足: ${Math.abs(change).toLocaleString()}円`;
+    document.getElementById("change").textContent =
+      `不足: ${Math.abs(change).toLocaleString()}円`;
     return;
   }
 
-  document.getElementById("change").textContent = `お釣り: ${change.toLocaleString()}円`;
+  // ⭐ 여기서만 おわり 버튼 표시
+  finishBtn.style.display = "block";
+
+  document.getElementById("change").textContent =
+    `お釣り: ${change.toLocaleString()}円`;
+
   saveHistory(received, total);
   window.scrollTo({ top: 0, behavior: "smooth" });
 }
