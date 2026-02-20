@@ -61,8 +61,17 @@
   <div class="col-4 text-end">数量</div>
 </div>
 
-<!-- 상품 리스트 -->
+<!-- 기본 상품 리스트 -->
 <div id="items"></div>
+
+<!-- ⭐ その他 상품 접기/열기 -->
+<h4 class="mt-3 toggle-header" onclick="toggleSection('extraProducts')">
+  その他 <span id="extraArrow">▼</span>
+</h4>
+
+<div id="extraProducts" style="display:none;">
+  <div id="extraItems"></div>
+</div>
 
 <!-- 합계 -->
 <div id="total" class="mt-3">合計: 0円</div>
@@ -87,7 +96,7 @@
 <!-- 거스름돈 -->
 <div id="change" class="mt-2"></div>
 
-<!-- ⭐ 販売集計 (접기/열기) -->
+<!-- 販売集計 (접기/열기) -->
 <h3 class="mt-4 toggle-header" onclick="toggleSection('summaryContent')">
   販売集計 <span id="summaryArrow">▼</span>
 </h3>
@@ -99,7 +108,7 @@
   </div>
 </div>
 
-<!-- ⭐ 계산 이력 (접기/열기) -->
+<!-- 계산 이력 (접기/열기) -->
 <h3 class="mt-4 toggle-header" onclick="toggleSection('historyContent')">
   計算履歴 <span id="historyArrow">▼</span>
 </h3>
@@ -123,12 +132,16 @@
 let historyArray = [];
 let historyCount = 0;
 
-/* ⭐ 상품 목록 (신규 4종 포함) */
+/* ⭐ 기본 상품 */
 const products = [
   { name: "上諏訪の女", price: 1250 },
   { name: "捨てちまえ", price: 1350 },
   { name: "衿子", price: 1500 },
-  { name: "天野涼 ペンライト", price: 3000 },
+  { name: "天野涼 ペンライト", price: 3000 }
+];
+
+/* ⭐ 기타 상품(접기/열기 대상) */
+const extraProducts = [
   { name: "電池(3本)", price: 100 },
   { name: "3/12大井町きゅりあんチケット", price: 4500 },
   { name: "3/18栃木野木チケット", price: 4500 },
@@ -136,8 +149,9 @@ const products = [
 ];
 
 const itemsDiv = document.getElementById("items");
+const extraDiv = document.getElementById("extraItems");
 
-/* 상품 리스트 생성 */
+/* ⭐ 기본 상품 출력 */
 products.forEach((p, idx) => {
   const row = document.createElement("div");
   row.className = "row align-items-center mb-2";
@@ -158,9 +172,39 @@ products.forEach((p, idx) => {
   itemsDiv.appendChild(row);
 });
 
-/* 수량 변경 */
+/* ⭐ 기타 상품 출력 */
+extraProducts.forEach((p, idx) => {
+  const row = document.createElement("div");
+  row.className = "row align-items-center mb-2";
+
+  row.innerHTML = `
+    <div class="col-5">${p.name}</div>
+    <div class="col-3 text-end">${p.price.toLocaleString()}円</div>
+    <div class="col-4 text-end qty-buttons">
+      <button class="btn btn-outline-secondary btn-sm" onclick="changeExtraQty(${idx}, -1)">
+        <i class="fa-solid fa-minus"></i>
+      </button>
+      <span id="extraQty${idx}" class="mx-2">0</span>
+      <button class="btn btn-outline-secondary btn-sm" onclick="changeExtraQty(${idx}, 1)">
+        <i class="fa-solid fa-plus"></i>
+      </button>
+    </div>
+  `;
+  extraDiv.appendChild(row);
+});
+
+/* 기본 상품 수량 변경 */
 function changeQty(i, delta) {
   const qtySpan = document.getElementById("qty" + i);
+  let qty = parseInt(qtySpan.textContent) + delta;
+  if (qty < 0) qty = 0;
+  qtySpan.textContent = qty;
+  calcTotal();
+}
+
+/* 기타 상품 수량 변경 */
+function changeExtraQty(i, delta) {
+  const qtySpan = document.getElementById("extraQty" + i);
   let qty = parseInt(qtySpan.textContent) + delta;
   if (qty < 0) qty = 0;
   qtySpan.textContent = qty;
@@ -170,10 +214,17 @@ function changeQty(i, delta) {
 /* 합계 계산 */
 function calcTotal() {
   let sum = 0;
+
   products.forEach((p, i) => {
     const qty = parseInt(document.getElementById("qty" + i).textContent);
     sum += p.price * qty;
   });
+
+  extraProducts.forEach((p, i) => {
+    const qty = parseInt(document.getElementById("extraQty" + i).textContent);
+    sum += p.price * qty;
+  });
+
   document.getElementById("total").textContent = `合計: ${sum.toLocaleString()}円`;
   return sum;
 }
@@ -230,6 +281,9 @@ function resetAll() {
   products.forEach((_, i) => {
     document.getElementById("qty" + i).textContent = 0;
   });
+  extraProducts.forEach((_, i) => {
+    document.getElementById("extraQty" + i).textContent = 0;
+  });
   document.getElementById("received").value = "";
   document.getElementById("change").textContent = "";
   calcTotal();
@@ -243,8 +297,13 @@ function saveHistory(received, total) {
   const change = received - total;
 
   const qtyObj = {};
+
   products.forEach((p, i) => {
     qtyObj[p.name] = parseInt(document.getElementById("qty" + i).textContent);
+  });
+
+  extraProducts.forEach((p, i) => {
+    qtyObj[p.name] = parseInt(document.getElementById("extraQty" + i).textContent);
   });
 
   const entry = {
@@ -325,7 +384,7 @@ function shareLine() {
   let productSalesTotals = {};
   let totalSales = 0;
 
-  products.forEach(p => {
+  [...products, ...extraProducts].forEach(p => {
     productQtyTotals[p.name] = 0;
     productSalesTotals[p.name] = 0;
   });
@@ -335,7 +394,7 @@ function shareLine() {
 
     for (const name in entry.qty) {
       const qty = entry.qty[name];
-      const price = products.find(p => p.name === name).price;
+      const price = [...products, ...extraProducts].find(p => p.name === name).price;
 
       productQtyTotals[name] += qty;
       productSalesTotals[name] += qty * price;
@@ -395,7 +454,7 @@ function updateSummary() {
   let productSalesTotals = {};
   let totalSales = 0;
 
-  products.forEach(p => {
+  [...products, ...extraProducts].forEach(p => {
     productQtyTotals[p.name] = 0;
     productSalesTotals[p.name] = 0;
   });
@@ -405,7 +464,7 @@ function updateSummary() {
 
     for (const name in entry.qty) {
       const qty = entry.qty[name];
-      const price = products.find(p => p.name === name).price;
+      const price = [...products, ...extraProducts].find(p => p.name === name).price;
 
       productQtyTotals[name] += qty;
       productSalesTotals[name] += qty * price;
@@ -427,7 +486,9 @@ function updateSummary() {
 function toggleSection(id) {
   const section = document.getElementById(id);
   const arrow = document.getElementById(
-    id === "summaryContent" ? "summaryArrow" : "historyArrow"
+    id === "summaryContent" ? "summaryArrow" :
+    id === "historyContent" ? "historyArrow" :
+    id === "extraProducts" ? "extraArrow" : null
   );
 
   if (section.style.display === "none") {
@@ -453,23 +514,4 @@ document.getElementById("received").addEventListener("blur", function () {
 
 /* Enter → 계산 */
 document.getElementById("received").addEventListener("keydown", function(e) {
-  if (e.key === "Enter") {
-    calcChange();
-    window.scrollTo({ top: 0, behavior: "smooth" });
-  }
-});
-
-/* 페이지 로드 시 localStorage 복원 */
-window.onload = () => {
-  const saved = localStorage.getItem("historyData");
-  if (saved) {
-    historyArray = JSON.parse(saved);
-    historyCount = historyArray.length > 0 ? historyArray[0].id : 0;
-    renderHistory();
-    updateSummary();
-  }
-};
-</script>
-
-</body>
-</html>
+  if (e.key
