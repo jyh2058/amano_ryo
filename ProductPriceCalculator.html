@@ -78,7 +78,7 @@
   <div id="change" class="flex-grow-1"></div>
 
   <button id="finishBtn" class="btn btn-outline-danger flex-shrink-0"
-          onclick="resetAll()" style="visibility:hidden;">
+          onclick="finishAndSave()" style="visibility:hidden;">
     おわり
   </button>
 </div>
@@ -250,7 +250,7 @@ function calcChange() {
   document.getElementById("change").textContent =
     `お釣り: ${change.toLocaleString()}円`;
 
-  saveHistory(received, total);
+  //saveHistory(received, total);
   window.scrollTo({ top: 0, behavior: "smooth" });
 }
 
@@ -260,6 +260,18 @@ function setExactAmount() {
   if (total === 0) return document.getElementById("change").textContent = "数量を入力してください。";
   document.getElementById("received").value = total.toLocaleString();
   calcChange();
+}
+
+function finishAndSave() {
+  const total = calcTotal();
+  const received = getReceivedValue();
+  const changeText = document.getElementById("change").textContent;
+
+  if (changeText.includes("お釣り")) {
+    saveHistory(received, total);
+  }
+
+  resetAll();
 }
 
 /* 초기화 */
