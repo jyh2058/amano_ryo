@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 
-<!-- ⭐ 요청한 OG 태그 그대로 반영 -->
+<!-- OG Tags -->
 <meta property="og:title" content="グッズ販売 計算ツール">
 <meta property="og:description" content="グッズ販売の計算ツールです。">
 <meta property="og:url" content="https://jyh2058.github.io/amano_ryo/">
@@ -18,121 +18,106 @@
 
 <style>
   body { font-family: sans-serif; padding: 5px; }
-
-  #total, #change {
-    font-size: 1.4em;
-    font-weight: bold;
-    margin-top: 15px;
-  }
-
-  #change {
-    min-height: 28px;
-    display: flex;
-    align-items: center;
-  }
-
-  #receivedLabel {
-    font-size: 1.4em;
-    font-weight: bold;
-    height: 38px;
-  }
-
+  #total, #change { font-size: 1.4em; font-weight: bold; margin-top: 15px; }
+  #change { min-height: 28px; display: flex; align-items: center; }
+  #receivedLabel { font-size: 1.4em; font-weight: bold; height: 38px; }
   .qty-buttons { white-space: nowrap; }
   button { touch-action: manipulation; }
-
-  .toggle-header {
-    cursor: pointer;
-    user-select: none;
-  }
 </style>
 </head>
 <body>
 
-<!-- 상단 바 -->
+<!-- Header -->
 <div class="d-flex justify-content-between align-items-center mb-3">
   <h2 class="m-0">グッズ販売</h2>
   <button id="resetBtn" class="btn btn-danger" onclick="resetAll()">計算内容を消去</button>
 </div>
 
-<!-- 상품 헤더 -->
+<!-- Table Header -->
 <div class="row fw-bold border-bottom pb-2 mb-2">
   <div class="col-5">商品名</div>
   <div class="col-3 text-end">単価</div>
   <div class="col-4 text-end">数量</div>
 </div>
 
-<!-- 기본 상품 리스트 -->
+<!-- 기본 상품 -->
 <div id="items"></div>
 
-<!-- ⭐ その他 상품 접기/열기 -->
-<h4 class="mt-3 toggle-header" onclick="toggleSection('extraProducts')">
-  その他商品 <span id="extraArrow">▼</span>
-</h4>
+<!-- Accordion -->
+<div class="accordion mt-4" id="mainAccordion">
 
-<div id="extraProducts" style="display:none;">
-  <div id="extraItems"></div>
+  <!-- その他商品 -->
+  <div class="accordion-item">
+    <h2 class="accordion-header" id="headingExtra">
+      <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseExtra">
+        その他商品
+      </button>
+    </h2>
+    <div id="collapseExtra" class="accordion-collapse collapse" data-bs-parent="#mainAccordion">
+      <div class="accordion-body">
+        <div id="extraItems"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 販売集計 -->
+  <div class="accordion-item">
+    <h2 class="accordion-header" id="headingSummary">
+      <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseSummary">
+        販売集計
+      </button>
+    </h2>
+    <div id="collapseSummary" class="accordion-collapse collapse" data-bs-parent="#mainAccordion">
+      <div class="accordion-body">
+        <div id="summaryBox" class="p-2 border rounded">
+          <div id="totalSales" class="mb-2"><strong>総売上金額:</strong> 0円</div>
+          <div id="productQty"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 計算履歴 -->
+  <div class="accordion-item">
+    <h2 class="accordion-header" id="headingHistory">
+      <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseHistory">
+        計算履歴
+      </button>
+    </h2>
+    <div id="collapseHistory" class="accordion-collapse collapse" data-bs-parent="#mainAccordion">
+      <div class="accordion-body">
+        <div id="historyList"></div>
+      </div>
+    </div>
+  </div>
+
 </div>
 
-<!-- 합계 -->
+<!-- Total -->
 <div id="total" class="mt-3">合計: 0円</div>
 
-<!-- 받은 금액 -->
+<!-- Received -->
 <div class="d-flex align-items-center flex-nowrap mt-3" style="gap:6px;">
   <div id="receivedLabel" class="d-flex align-items-center flex-shrink-0">受取金額:</div>
-
-  <input 
-    type="text"
-    id="received"
-    inputmode="numeric"
-    pattern="[0-9]*"
-    class="form-control flex-shrink-1"
-    style="max-width: 100px; font-size:16px;"
-  >
-
+  <input type="text" id="received" inputmode="numeric" pattern="[0-9]*" class="form-control flex-shrink-1" style="max-width: 100px; font-size:16px;">
   <button class="btn btn-primary flex-shrink-0" onclick="calcChange()">計算</button>
   <button class="btn btn-success flex-shrink-0" onclick="setExactAmount()">ちょうど</button>
 </div>
 
-<!-- 거스름돈 -->
+<!-- Change -->
 <div id="change" class="mt-2"></div>
 
-<!-- 販売集計 (접기/열기) -->
-<h3 class="mt-4 toggle-header" onclick="toggleSection('summaryContent')">
-  販売集計 <span id="summaryArrow">▼</span>
-</h3>
-
-<div id="summaryContent" style="display:none;">
-  <div id="summaryBox" class="mt-2 p-2 border rounded">
-    <div id="totalSales" class="mb-2"><strong>総売上金額:</strong> 0円</div>
-    <div id="productQty"></div>
-  </div>
-</div>
-
-<!-- 계산 이력 (접기/열기) -->
-<h3 class="mt-4 toggle-header" onclick="toggleSection('historyContent')">
-  計算履歴 <span id="historyArrow">▼</span>
-</h3>
-
-<div id="historyContent" style="display:none;">
-  <div id="historyList"></div>
-</div>
-
-<!-- LINE 공유 + 전체 삭제 -->
+<!-- Buttons -->
 <div class="d-flex gap-2 mt-3">
-  <button class="btn btn-success btn-sm px-2 py-1" onclick="shareLine()">
-    LINE共有(集計・履歴)
-  </button>
-
-  <button class="btn btn-danger btn-sm px-2 py-1" onclick="clearAllHistory()">
-    全削除
-  </button>
+  <button class="btn btn-success btn-sm px-2 py-1" onclick="shareLine()">LINE共有(集計・履歴)</button>
+  <button class="btn btn-danger btn-sm px-2 py-1" onclick="clearAllHistory()">全削除</button>
 </div>
 
 <script>
 let historyArray = [];
 let historyCount = 0;
 
-/* ⭐ 기본 상품 */
+/* 기본 상품 */
 const products = [
   { name: "上諏訪の女", price: 1250 },
   { name: "捨てちまえ", price: 1350 },
@@ -140,7 +125,7 @@ const products = [
   { name: "天野涼 ペンライト", price: 3000 }
 ];
 
-/* ⭐ 기타 상품(접기/열기 대상) */
+/* 기타 상품 */
 const extraProducts = [
   { name: "電池(3本)", price: 100 },
   { name: "3/12大井町きゅりあんチケット", price: 4500 },
@@ -151,49 +136,37 @@ const extraProducts = [
 const itemsDiv = document.getElementById("items");
 const extraDiv = document.getElementById("extraItems");
 
-/* ⭐ 기본 상품 출력 */
+/* 기본 상품 출력 */
 products.forEach((p, idx) => {
   const row = document.createElement("div");
   row.className = "row align-items-center mb-2";
-
   row.innerHTML = `
     <div class="col-5">${p.name}</div>
     <div class="col-3 text-end">${p.price.toLocaleString()}円</div>
     <div class="col-4 text-end qty-buttons">
-      <button class="btn btn-outline-secondary btn-sm" onclick="changeQty(${idx}, -1)">
-        <i class="fa-solid fa-minus"></i>
-      </button>
+      <button class="btn btn-outline-secondary btn-sm" onclick="changeQty(${idx}, -1)"><i class="fa-solid fa-minus"></i></button>
       <span id="qty${idx}" class="mx-2">0</span>
-      <button class="btn btn-outline-secondary btn-sm" onclick="changeQty(${idx}, 1)">
-        <i class="fa-solid fa-plus"></i>
-      </button>
-    </div>
-  `;
+      <button class="btn btn-outline-secondary btn-sm" onclick="changeQty(${idx}, 1)"><i class="fa-solid fa-plus"></i></button>
+    </div>`;
   itemsDiv.appendChild(row);
 });
 
-/* ⭐ 기타 상품 출력 */
+/* 기타 상품 출력 */
 extraProducts.forEach((p, idx) => {
   const row = document.createElement("div");
   row.className = "row align-items-center mb-2";
-
   row.innerHTML = `
     <div class="col-5">${p.name}</div>
     <div class="col-3 text-end">${p.price.toLocaleString()}円</div>
     <div class="col-4 text-end qty-buttons">
-      <button class="btn btn-outline-secondary btn-sm" onclick="changeExtraQty(${idx}, -1)">
-        <i class="fa-solid fa-minus"></i>
-      </button>
+      <button class="btn btn-outline-secondary btn-sm" onclick="changeExtraQty(${idx}, -1)"><i class="fa-solid fa-minus"></i></button>
       <span id="extraQty${idx}" class="mx-2">0</span>
-      <button class="btn btn-outline-secondary btn-sm" onclick="changeExtraQty(${idx}, 1)">
-        <i class="fa-solid fa-plus"></i>
-      </button>
-    </div>
-  `;
+      <button class="btn btn-outline-secondary btn-sm" onclick="changeExtraQty(${idx}, 1)"><i class="fa-solid fa-plus"></i></button>
+    </div>`;
   extraDiv.appendChild(row);
 });
 
-/* 기본 상품 수량 변경 */
+/* 수량 변경 */
 function changeQty(i, delta) {
   const qtySpan = document.getElementById("qty" + i);
   let qty = parseInt(qtySpan.textContent) + delta;
@@ -202,7 +175,6 @@ function changeQty(i, delta) {
   calcTotal();
 }
 
-/* 기타 상품 수량 변경 */
 function changeExtraQty(i, delta) {
   const qtySpan = document.getElementById("extraQty" + i);
   let qty = parseInt(qtySpan.textContent) + delta;
@@ -211,20 +183,11 @@ function changeExtraQty(i, delta) {
   calcTotal();
 }
 
-/* 합계 계산 */
+/* 합계 */
 function calcTotal() {
   let sum = 0;
-
-  products.forEach((p, i) => {
-    const qty = parseInt(document.getElementById("qty" + i).textContent);
-    sum += p.price * qty;
-  });
-
-  extraProducts.forEach((p, i) => {
-    const qty = parseInt(document.getElementById("extraQty" + i).textContent);
-    sum += p.price * qty;
-  });
-
+  products.forEach((p, i) => sum += p.price * parseInt(document.getElementById("qty" + i).textContent));
+  extraProducts.forEach((p, i) => sum += p.price * parseInt(document.getElementById("extraQty" + i).textContent));
   document.getElementById("total").textContent = `合計: ${sum.toLocaleString()}円`;
   return sum;
 }
@@ -240,27 +203,17 @@ function calcChange() {
   const total = calcTotal();
   const received = getReceivedValue();
 
-  if (total === 0) {
-    document.getElementById("change").textContent = "数量を入力してください。";
-    return;
-  }
-
-  if (received === 0) {
-    document.getElementById("change").textContent = "受取金額を入力してください。";
-    return;
-  }
+  if (total === 0) return document.getElementById("change").textContent = "数量を入力してください。";
+  if (received === 0) return document.getElementById("change").textContent = "受取金額を入力してください。";
 
   const change = received - total;
 
   if (change < 0) {
-    document.getElementById("change").textContent =
-      `不足: ${Math.abs(change).toLocaleString()}円`;
+    document.getElementById("change").textContent = `不足: ${Math.abs(change).toLocaleString()}円`;
     return;
   }
 
-  document.getElementById("change").textContent =
-    `お釣り: ${change.toLocaleString()}円`;
-
+  document.getElementById("change").textContent = `お釣り: ${change.toLocaleString()}円`;
   saveHistory(received, total);
   window.scrollTo({ top: 0, behavior: "smooth" });
 }
@@ -268,22 +221,15 @@ function calcChange() {
 /* ちょうど */
 function setExactAmount() {
   const total = calcTotal();
-  if (total === 0) {
-    document.getElementById("change").textContent = "数量を入力してください。";
-    return;
-  }
+  if (total === 0) return document.getElementById("change").textContent = "数量を入力してください。";
   document.getElementById("received").value = total.toLocaleString();
   calcChange();
 }
 
-/* 계산 내용 초기화 */
+/* 초기화 */
 function resetAll() {
-  products.forEach((_, i) => {
-    document.getElementById("qty" + i).textContent = 0;
-  });
-  extraProducts.forEach((_, i) => {
-    document.getElementById("extraQty" + i).textContent = 0;
-  });
+  products.forEach((_, i) => document.getElementById("qty" + i).textContent = 0);
+  extraProducts.forEach((_, i) => document.getElementById("extraQty" + i).textContent = 0);
   document.getElementById("received").value = "";
   document.getElementById("change").textContent = "";
   calcTotal();
@@ -292,29 +238,14 @@ function resetAll() {
 /* 이력 저장 */
 function saveHistory(received, total) {
   historyCount++;
-
   const time = new Date().toLocaleTimeString("ja-JP", { hour12: false });
   const change = received - total;
 
   const qtyObj = {};
+  products.forEach((p, i) => qtyObj[p.name] = parseInt(document.getElementById("qty" + i).textContent));
+  extraProducts.forEach((p, i) => qtyObj[p.name] = parseInt(document.getElementById("extraQty" + i).textContent));
 
-  products.forEach((p, i) => {
-    qtyObj[p.name] = parseInt(document.getElementById("qty" + i).textContent);
-  });
-
-  extraProducts.forEach((p, i) => {
-    qtyObj[p.name] = parseInt(document.getElementById("extraQty" + i).textContent);
-  });
-
-  const entry = {
-    id: historyCount,
-    time,
-    received,
-    total,
-    change,
-    qty: qtyObj
-  };
-
+  const entry = { id: historyCount, time, received, total, change, qty: qtyObj };
   historyArray.unshift(entry);
   localStorage.setItem("historyData", JSON.stringify(historyArray));
 
@@ -328,14 +259,11 @@ function renderHistory() {
   list.innerHTML = "";
 
   historyArray.forEach(entry => {
+    let qtyList = "";
+    for (const key in entry.qty) qtyList += `${key}: ${entry.qty[key]}　`;
+
     const div = document.createElement("div");
     div.className = "history-item mt-3";
-
-    let qtyList = "";
-    for (const key in entry.qty) {
-      qtyList += `${key}: ${entry.qty[key]}　`;
-    }
-
     div.innerHTML = `
       <div><strong>No.${entry.id}</strong></div>
       <div><strong>時間:</strong> ${entry.time}</div>
@@ -343,13 +271,12 @@ function renderHistory() {
       <div><strong>合計:</strong> ${entry.total.toLocaleString()}円</div>
       <div><strong>お釣り:</strong> ${entry.change.toLocaleString()}円</div>
       <div><strong>数量:</strong> ${qtyList}</div>
-      <button class="btn btn-sm btn-outline-danger" onclick="deleteHistory(${entry.id})">削除</button>
-    `;
+      <button class="btn btn-sm btn-outline-danger" onclick="deleteHistory(${entry.id})">削除</button>`;
     list.appendChild(div);
   });
 }
 
-/* 이력 개별 삭제 */
+/* 이력 삭제 */
 function deleteHistory(id) {
   historyArray = historyArray.filter(e => e.id !== id);
   localStorage.setItem("historyData", JSON.stringify(historyArray));
@@ -360,26 +287,18 @@ function deleteHistory(id) {
 /* 전체 삭제 */
 function clearAllHistory() {
   if (!confirm("すべての履歴を削除しますか？")) return;
-
   historyArray = [];
   historyCount = 0;
-
   localStorage.removeItem("historyData");
-
   renderHistory();
-
   document.getElementById("totalSales").innerHTML = "<strong>総売上金額:</strong> 0円";
   document.getElementById("productQty").innerHTML = "";
 }
 
-/* ⭐ LINE 공유 (집계 포함) */
+/* LINE 공유 */
 function shareLine() {
-  if (historyArray.length === 0) {
-    alert("共有する履歴がありません。");
-    return;
-  }
+  if (historyArray.length === 0) return alert("共有する履歴がありません。");
 
-  /* 집계 계산 */
   let productQtyTotals = {};
   let productSalesTotals = {};
   let totalSales = 0;
@@ -391,17 +310,14 @@ function shareLine() {
 
   historyArray.forEach(entry => {
     totalSales += entry.total;
-
     for (const name in entry.qty) {
       const qty = entry.qty[name];
       const price = [...products, ...extraProducts].find(p => p.name === name).price;
-
       productQtyTotals[name] += qty;
       productSalesTotals[name] += qty * price;
     }
   });
 
-  /* 집계 텍스트 */
   let summaryText =
 `==============================
 【販売集計】
@@ -414,15 +330,10 @@ function shareLine() {
 
   summaryText += "==============================\n\n\n";
 
-  /* 이력 텍스트 */
   let historyText = "";
-
   historyArray.forEach(entry => {
     let qtyList = "";
-    for (const key in entry.qty) {
-      qtyList += `${key}:${entry.qty[key]} `;
-    }
-
+    for (const key in entry.qty) qtyList += `${key}:${entry.qty[key]} `;
     historyText +=
 `----------------------------------------
  No: ${entry.id}
@@ -437,12 +348,11 @@ function shareLine() {
 `;
   });
 
-  /* LINE 공유 */
   const encoded = encodeURIComponent(summaryText + historyText);
   window.location.href = `line://msg/text/${encoded}`;
 }
 
-/* 판매 집계 업데이트 */
+/* 집계 업데이트 */
 function updateSummary() {
   if (historyArray.length === 0) {
     document.getElementById("totalSales").innerHTML = "<strong>総売上金額:</strong> 0円";
@@ -461,11 +371,9 @@ function updateSummary() {
 
   historyArray.forEach(entry => {
     totalSales += entry.total;
-
     for (const name in entry.qty) {
       const qty = entry.qty[name];
       const price = [...products, ...extraProducts].find(p => p.name === name).price;
-
       productQtyTotals[name] += qty;
       productSalesTotals[name] += qty * price;
     }
@@ -482,24 +390,6 @@ function updateSummary() {
   document.getElementById("productQty").innerHTML = html;
 }
 
-/* 접기/열기 기능 */
-function toggleSection(id) {
-  const section = document.getElementById(id);
-  const arrow = document.getElementById(
-    id === "summaryContent" ? "summaryArrow" :
-    id === "historyContent" ? "historyArrow" :
-    id === "extraProducts" ? "extraArrow" : null
-  );
-
-  if (section.style.display === "none") {
-    section.style.display = "block";
-    arrow.textContent = "▲";
-  } else {
-    section.style.display = "none";
-    arrow.textContent = "▼";
-  }
-}
-
 /* 콤마 처리 */
 document.getElementById("received").addEventListener("focus", function () {
   this.value = this.value.replace(/,/g, "");
@@ -507,9 +397,7 @@ document.getElementById("received").addEventListener("focus", function () {
 
 document.getElementById("received").addEventListener("blur", function () {
   let v = this.value.replace(/,/g, "");
-  if (v !== "" && !isNaN(v)) {
-    this.value = Number(v).toLocaleString();
-  }
+  if (v !== "" && !isNaN(v)) this.value = Number(v).toLocaleString();
 });
 
 /* Enter → 계산 */
@@ -520,7 +408,7 @@ document.getElementById("received").addEventListener("keydown", function(e) {
   }
 });
 
-/* 페이지 로드 시 localStorage 복원 */
+/* 로드 시 복원 */
 window.onload = () => {
   const saved = localStorage.getItem("historyData");
   if (saved) {
@@ -530,25 +418,9 @@ window.onload = () => {
     updateSummary();
   }
 };
-
-/* ⭐ 접기/열기 기능 (에러 원인 부분 — 반드시 포함해야 함) */
-function toggleSection(id) {
-  const section = document.getElementById(id);
-  const arrow = document.getElementById(
-    id === "summaryContent" ? "summaryArrow" :
-    id === "historyContent" ? "historyArrow" :
-    id === "extraProducts" ? "extraArrow" : null
-  );
-
-  if (section.style.display === "none") {
-    section.style.display = "block";
-    arrow.textContent = "▲";
-  } else {
-    section.style.display = "none";
-    arrow.textContent = "▼";
-  }
-}
 </script>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
 
 </body>
 </html>
