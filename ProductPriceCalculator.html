@@ -268,7 +268,7 @@ function resetAll() {
   extraProducts.forEach((_, i) => document.getElementById("extraQty" + i).textContent = 0);
   document.getElementById("received").value = "";
   document.getElementById("change").textContent = "";
-  finishBtn.style.visible = "hidden";
+  finishBtn.style.visibility = "hidden";
   calcTotal();
 }
 
