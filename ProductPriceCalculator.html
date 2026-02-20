@@ -3,12 +3,14 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<!-- Open Graph -->
+
+<!-- ⭐ 요청한 OG 태그 그대로 반영 -->
 <meta property="og:title" content="グッズ販売 計算ツール">
 <meta property="og:description" content="グッズ販売の計算ツールです。">
 <meta property="og:url" content="https://jyh2058.github.io/amano_ryo/">
 <meta property="og:type" content="website">
-  
+<meta property="og:image" content="https://jyh2058.github.io/amano_ryo/og-image.jpg">
+
 <title>グッズ販売</title>
 
 <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
@@ -37,6 +39,11 @@
 
   .qty-buttons { white-space: nowrap; }
   button { touch-action: manipulation; }
+
+  .toggle-header {
+    cursor: pointer;
+    user-select: none;
+  }
 </style>
 </head>
 <body>
@@ -80,24 +87,37 @@
 <!-- 거스름돈 -->
 <div id="change" class="mt-2"></div>
 
-<!-- 판매 집계 -->
-<h3 class="mt-4">販売集計</h3>
-<div id="summaryBox" class="mt-2 p-2 border rounded">
-  <div id="totalSales" class="mb-2"><strong>総売上金額:</strong> 0円</div>
-  <div id="productQty"></div>
-</div>
+<!-- ⭐ 販売集計 (접기/열기) -->
+<h3 class="mt-4 toggle-header" onclick="toggleSection('summaryContent')">
+  販売集計 <span id="summaryArrow">▼</span>
+</h3>
 
-<!-- 이력 + LINE 공유 + 전체 삭제 -->
-<div class="d-flex justify-content-between align-items-center mt-4">
-  <h3 class="m-0">計算履歴</h3>
-
-  <div class="d-flex gap-2">
-    <button class="btn btn-success btn-sm px-2 py-1" onclick="shareLine()">LINE共有(集計・履歴)</button>
-    <button class="btn btn-danger btn-sm px-2 py-1" onclick="clearAllHistory()">全削除</button>
+<div id="summaryContent" style="display:none;">
+  <div id="summaryBox" class="mt-2 p-2 border rounded">
+    <div id="totalSales" class="mb-2"><strong>総売上金額:</strong> 0円</div>
+    <div id="productQty"></div>
   </div>
 </div>
 
-<div id="historyList"></div>
+<!-- ⭐ 계산 이력 (접기/열기) -->
+<h3 class="mt-4 toggle-header" onclick="toggleSection('historyContent')">
+  計算履歴 <span id="historyArrow">▼</span>
+</h3>
+
+<div id="historyContent" style="display:none;">
+  <div id="historyList"></div>
+</div>
+
+<!-- LINE 공유 + 전체 삭제 -->
+<div class="d-flex gap-2 mt-3">
+  <button class="btn btn-success btn-sm px-2 py-1" onclick="shareLine()">
+    LINE共有(集計・履歴)
+  </button>
+
+  <button class="btn btn-danger btn-sm px-2 py-1" onclick="clearAllHistory()">
+    全削除
+  </button>
+</div>
 
 <script>
 let historyArray = [];
@@ -138,6 +158,7 @@ products.forEach((p, idx) => {
   itemsDiv.appendChild(row);
 });
 
+/* 수량 변경 */
 function changeQty(i, delta) {
   const qtySpan = document.getElementById("qty" + i);
   let qty = parseInt(qtySpan.textContent) + delta;
@@ -146,6 +167,7 @@ function changeQty(i, delta) {
   calcTotal();
 }
 
+/* 합계 계산 */
 function calcTotal() {
   let sum = 0;
   products.forEach((p, i) => {
@@ -156,11 +178,13 @@ function calcTotal() {
   return sum;
 }
 
+/* 받은 금액 */
 function getReceivedValue() {
   const raw = document.getElementById("received").value.replace(/,/g, "");
   return raw === "" ? 0 : parseInt(raw);
 }
 
+/* 계산 */
 function calcChange() {
   const total = calcTotal();
   const received = getReceivedValue();
@@ -190,6 +214,7 @@ function calcChange() {
   window.scrollTo({ top: 0, behavior: "smooth" });
 }
 
+/* ちょうど */
 function setExactAmount() {
   const total = calcTotal();
   if (total === 0) {
@@ -200,6 +225,7 @@ function setExactAmount() {
   calcChange();
 }
 
+/* 계산 내용 초기화 */
 function resetAll() {
   products.forEach((_, i) => {
     document.getElementById("qty" + i).textContent = 0;
@@ -209,6 +235,7 @@ function resetAll() {
   calcTotal();
 }
 
+/* 이력 저장 */
 function saveHistory(received, total) {
   historyCount++;
 
@@ -236,6 +263,7 @@ function saveHistory(received, total) {
   updateSummary();
 }
 
+/* 이력 표시 */
 function renderHistory() {
   const list = document.getElementById("historyList");
   list.innerHTML = "";
@@ -262,6 +290,7 @@ function renderHistory() {
   });
 }
 
+/* 이력 개별 삭제 */
 function deleteHistory(id) {
   historyArray = historyArray.filter(e => e.id !== id);
   localStorage.setItem("historyData", JSON.stringify(historyArray));
@@ -269,6 +298,7 @@ function deleteHistory(id) {
   updateSummary();
 }
 
+/* 전체 삭제 */
 function clearAllHistory() {
   if (!confirm("すべての履歴を削除しますか？")) return;
 
@@ -283,7 +313,7 @@ function clearAllHistory() {
   document.getElementById("productQty").innerHTML = "";
 }
 
-/* ⭐ LINE 공유 시 집계 포함 */
+/* ⭐ LINE 공유 (집계 포함) */
 function shareLine() {
   if (historyArray.length === 0) {
     alert("共有する履歴がありません。");
@@ -353,6 +383,7 @@ function shareLine() {
   window.location.href = `line://msg/text/${encoded}`;
 }
 
+/* 판매 집계 업데이트 */
 function updateSummary() {
   if (historyArray.length === 0) {
     document.getElementById("totalSales").innerHTML = "<strong>総売上金額:</strong> 0円";
@@ -390,6 +421,22 @@ function updateSummary() {
   }
 
   document.getElementById("productQty").innerHTML = html;
+}
+
+/* 접기/열기 기능 */
+function toggleSection(id) {
+  const section = document.getElementById(id);
+  const arrow = document.getElementById(
+    id === "summaryContent" ? "summaryArrow" : "historyArrow"
+  );
+
+  if (section.style.display === "none") {
+    section.style.display = "block";
+    arrow.textContent = "▲";
+  } else {
+    section.style.display = "none";
+    arrow.textContent = "▼";
+  }
 }
 
 /* 콤마 처리 */
