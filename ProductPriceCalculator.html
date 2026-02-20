@@ -387,12 +387,36 @@ function updateSummary() {
   document.getElementById("totalSales").innerHTML =
     `<strong>総売上金額:</strong> ${totalSales.toLocaleString()}円`;
 
-  let html = "<strong>商品別販売:</strong><br>";
-  for (const name in productQtyTotals) {
-    html += `${name}: ${productQtyTotals[name]}個 / ${productSalesTotals[name].toLocaleString()}円<br>`;
-  }
+let html = `
+  <strong>商品別販売:</strong>
+  <table class="table table-bordered table-sm mt-2">
+    <thead>
+      <tr>
+        <th>商品名</th>
+        <th class="text-end">販売数</th>
+        <th class="text-end">販売金額</th>
+      </tr>
+    </thead>
+    <tbody>
+`;
 
-  document.getElementById("productQty").innerHTML = html;
+for (const name in productQtyTotals) {
+  html += `
+    <tr>
+      <td>${name}</td>
+      <td class="text-end">${productQtyTotals[name]}個</td>
+      <td class="text-end">${productSalesTotals[name].toLocaleString()}円</td>
+    </tr>
+  `;
+}
+
+html += `
+    </tbody>
+  </table>
+`;
+
+document.getElementById("productQty").innerHTML = html;
+
 }
 
 /* 콤마 처리 */
