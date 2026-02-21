@@ -533,20 +533,28 @@ function downloadCSV() {
     return;
   }
 
-  let csv = "No,時間,受取,合計,お釣り,商品名,数量\n";
+  // 모든 상품명 리스트 생성
+  const allProducts = [...products, ...extraProducts].map(p => p.name);
 
+  // CSV 헤더 생성
+  let csv = "No,時間,受取,合計,お釣り," + allProducts.join(",") + "\n";
+
+  // 각 이력을 한 줄로 출력
   historyArray.forEach(entry => {
-    for (const name in entry.qty) {
-      csv += [
-        entry.id,
-        entry.time,
-        entry.received,
-        entry.total,
-        entry.change,
-        name,
-        entry.qty[name]
-      ].join(",") + "\n";
-    }
+    let row = [
+      entry.id,
+      entry.time,
+      entry.received,
+      entry.total,
+      entry.change
+    ];
+
+    // 상품별 수량을 열(column)로 추가
+    allProducts.forEach(name => {
+      row.push(entry.qty[name] ?? 0);
+    });
+
+    csv += row.join(",") + "\n";
   });
 
   const blob = new Blob([csv], { type: "text/csv;charset=utf-8;" });
