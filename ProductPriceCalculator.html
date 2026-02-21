@@ -267,20 +267,22 @@ function finishAndSave() {
   const received = getReceivedValue();
   const changeText = document.getElementById("change").textContent;
 
-  // お釣り가 있을 때만 이력 저장
   if (changeText.includes("お釣り")) {
     saveHistory(received, total);
   }
 
-  // ⭐ おわり 버튼을 눌렀을 때만 위로 스크롤
-  window.scrollTo({ top: 0, behavior: "smooth" });
-
-  // ⭐ その他商品 아코디온 닫기
+  // その他商品 아코디온 닫기
   const extraCollapse = document.getElementById("collapseExtra");
   const bsCollapse = bootstrap.Collapse.getOrCreateInstance(extraCollapse);
   bsCollapse.hide();
 
+  // 초기화 먼저 실행
   resetAll();
+
+  // ⭐ 레이아웃이 안정된 뒤 스크롤 실행 (100ms가 가장 안정적)
+  setTimeout(() => {
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  }, 100);
 }
 
 
