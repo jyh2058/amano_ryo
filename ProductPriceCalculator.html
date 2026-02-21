@@ -504,6 +504,12 @@ window.onload = () => {
     renderHistory();
     updateSummary();
   }
+
+  // ⭐ 아코디온 초기 상태를 명확하게 “닫힘”으로 설정
+  bootstrap.Collapse.getOrCreateInstance(
+    document.getElementById("collapseExtra"),
+    { toggle: false }
+  );
 };
 
 function downloadCSV() {
