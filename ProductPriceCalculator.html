@@ -271,7 +271,7 @@ function finishAndSave() {
     saveHistory(received, total);
   }
 
-  // その他商品 아코디온 닫기
+  // 기타상품 아코디온 닫기
   const extraCollapse = document.getElementById("collapseExtra");
   const bsCollapse = bootstrap.Collapse.getOrCreateInstance(extraCollapse);
   bsCollapse.hide();
@@ -279,10 +279,12 @@ function finishAndSave() {
   // 초기화 먼저 실행
   resetAll();
 
-  // ⭐ 레이아웃이 안정된 뒤 스크롤 실행 (100ms가 가장 안정적)
-  setTimeout(() => {
+  // ⭐ 아코디온 닫힘 애니메이션이 끝난 뒤 스크롤 실행
+  extraCollapse.addEventListener("hidden.bs.collapse", function handler() {
+    extraCollapse.removeEventListener("hidden.bs.collapse", handler);
+
     window.scrollTo({ top: 0, behavior: "smooth" });
-  }, 100);
+  });
 }
 
 
