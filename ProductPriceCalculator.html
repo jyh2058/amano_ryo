@@ -271,20 +271,25 @@ function finishAndSave() {
     saveHistory(received, total);
   }
 
-  // 기타상품 아코디온 닫기
   const extraCollapse = document.getElementById("collapseExtra");
   const bsCollapse = bootstrap.Collapse.getOrCreateInstance(extraCollapse);
-  bsCollapse.hide();
 
-  // 초기화 먼저 실행
-  resetAll();
+  // ⭐ 아코디온이 열려 있는지 체크
+  const isOpen = extraCollapse.classList.contains("show");
 
-  // ⭐ 아코디온 닫힘 애니메이션이 끝난 뒤 스크롤 실행
-  extraCollapse.addEventListener("hidden.bs.collapse", function handler() {
-    extraCollapse.removeEventListener("hidden.bs.collapse", handler);
-
+  if (isOpen) {
+    // 열려 있으면 닫고, 닫힌 뒤 스크롤
+    extraCollapse.addEventListener("hidden.bs.collapse", function handler() {
+      extraCollapse.removeEventListener("hidden.bs.collapse", handler);
+      window.scrollTo({ top: 0, behavior: "smooth" });
+    });
+    bsCollapse.hide();
+  } else {
+    // 이미 닫혀 있으면 즉시 스크롤
     window.scrollTo({ top: 0, behavior: "smooth" });
-  });
+  }
+
+  resetAll();
 }
 
 
