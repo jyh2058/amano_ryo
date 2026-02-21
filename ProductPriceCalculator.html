@@ -451,7 +451,8 @@ function updateSummary() {
     totalSales += entry.total;
     for (const name in entry.qty) {
       const qty = entry.qty[name];
-      const price = [...products, ...extraProducts].find(p => p.name === name).price;
+      const product = [...products, ...extraProducts].find(p => p.name === name);
+      const price = product ? product.price : 0;
       productQtyTotals[name] += qty;
       productSalesTotals[name] += qty * price;
     }
