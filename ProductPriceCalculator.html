@@ -251,7 +251,7 @@ function calcChange() {
     `お釣り: ${change.toLocaleString()}円`;
 
   //saveHistory(received, total);
-  window.scrollTo({ top: 0, behavior: "smooth" });
+  //window.scrollTo({ top: 0, behavior: "smooth" });
 }
 
 /* ちょうど */
@@ -267,12 +267,22 @@ function finishAndSave() {
   const received = getReceivedValue();
   const changeText = document.getElementById("change").textContent;
 
+  // お釣り가 있을 때만 이력 저장
   if (changeText.includes("お釣り")) {
     saveHistory(received, total);
   }
 
+  // ⭐ おわり 버튼을 눌렀을 때만 위로 스크롤
+  window.scrollTo({ top: 0, behavior: "smooth" });
+
+  // ⭐ その他商品 아코디온 닫기
+  const extraCollapse = document.getElementById("collapseExtra");
+  const bsCollapse = bootstrap.Collapse.getOrCreateInstance(extraCollapse);
+  bsCollapse.hide();
+
   resetAll();
 }
+
 
 /* 초기화 */
 function resetAll() {
